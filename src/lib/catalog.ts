@@ -229,6 +229,8 @@ function mapProduct(row: DbProduct): Product {
     name: row.name,
     category: categoryTitle,
     categorySlug: category?.slug ?? "covers-cases",
+    categoryId: row.categoryId ?? undefined,
+    collectionId: row.collectionId ?? undefined,
     requiresModelFit: row.requiresModelFit ?? true,
     defaultModelSlug: defaultOption?.slug ?? "",
     collection: collectionTitle,

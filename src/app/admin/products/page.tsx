@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
-import { formatPrice, type IphoneModel, type Product, type ProductCategory } from "@/data/products";
+import { formatPrice, type IphoneModel, type Product, type ProductCategory, type Collection } from "@/data/products";
 import { nameFromFilename, slugifyProduct, type ProductTemplate } from "@/lib/product-templates";
 import { getSupabaseBrowserClientAsync } from "@/lib/supabase/browser";
 
@@ -39,6 +39,7 @@ type CatalogResponse = {
   products: Product[];
   models: IphoneModel[];
   categories: ProductCategory[];
+  collections: Collection[];
   templates: ProductTemplate[];
   devMode?: boolean;
 };
@@ -78,6 +79,30 @@ export default function AdminPage() {
   const [selectedModelSlugs, setSelectedModelSlugs] = useState<string[]>([]);
   const [bulkRows, setBulkRows] = useState<BulkRow[]>([]);
 
+  // Search and Category filter for products list
+  const [productSearch, setProductSearch] = useState("");
+  const [productCategoryFilter, setProductCategoryFilter] = useState("all");
+
+  // Edit modal states
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Form fields for editing
+  const [editName, setEditName] = useState("");
+  const [editSlug, setEditSlug] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editPrice, setEditPrice] = useState(0);
+  const [editMrp, setEditMrp] = useState(0);
+  const [editTag, setEditTag] = useState("");
+  const [editIsActive, setEditIsActive] = useState(true);
+  const [editIsFeatured, setEditIsFeatured] = useState(false);
+  const [editSeoTitle, setEditSeoTitle] = useState("");
+  const [editSeoDescription, setEditSeoDescription] = useState("");
+  const [editCategoryId, setEditCategoryId] = useState("");
+  const [editCollectionId, setEditCollectionId] = useState("");
+  const [editFeaturesText, setEditFeaturesText] = useState("");
+  const [editStock, setEditStock] = useState(0);
+
   const categories = useMemo(() => catalog?.categories ?? [], [catalog]);
   const models = useMemo(() => catalog?.models ?? [], [catalog]);
   const templates = useMemo(() => catalog?.templates ?? [], [catalog]);
@@ -90,6 +115,33 @@ export default function AdminPage() {
     categoryTemplates[0];
   const requiresModelFit =
     selectedTemplate?.requiresModelFit ?? !modelFreeCategories.includes(selectedCategorySlug);
+
+  const stats = useMemo(() => {
+    const products = catalog?.products ?? [];
+    const total = products.length;
+    const active = products.filter((p) => p.isActive).length;
+    const featured = products.filter((p) => p.isFeatured).length;
+    const outOfStock = products.filter((p) => {
+      if (p.requiresModelFit) {
+        return p.modelOptions.filter((m) => m.isAvailable).length === 0;
+      }
+      return false;
+    }).length;
+
+    return { total, active, featured, outOfStock };
+  }, [catalog]);
+
+  const filteredProducts = useMemo(() => {
+    const products = catalog?.products ?? [];
+    return products.filter((p) => {
+      const matchesSearch =
+        p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
+        p.slug.toLowerCase().includes(productSearch.toLowerCase());
+      const matchesCategory =
+        productCategoryFilter === "all" || p.categorySlug === productCategoryFilter;
+      return matchesSearch && matchesCategory;
+    });
+  }, [catalog, productSearch, productCategoryFilter]);
 
   const getHeaders = useCallback(async (): Promise<Record<string, string> | null> => {
     const supabase = await getSupabaseBrowserClientAsync();
@@ -396,56 +448,79 @@ export default function AdminPage() {
     await loadAdminData();
   }
 
-  async function quickEditProduct(product: Product) {
-    const priceInput = window.prompt("Price", String(product.price));
+  function openEditModal(product: Product) {
+    setEditingProduct(product);
+    setEditName(product.name);
+    setEditSlug(product.slug);
+    setEditDescription(product.description || "");
+    setEditPrice(product.price);
+    setEditMrp(product.mrp);
+    setEditTag(product.tag || "");
+    setEditIsActive(product.isActive);
+    setEditIsFeatured(product.isFeatured);
+    setEditSeoTitle(product.seoTitle || "");
+    setEditSeoDescription(product.seoDescription || "");
+    setEditCategoryId(product.categoryId || "");
+    setEditCollectionId(product.collectionId || "");
+    setEditFeaturesText((product.features || []).join("\n"));
+    const firstVariantStock = product.selectedModel?.stock ?? 25;
+    setEditStock(firstVariantStock);
+    setIsEditModalOpen(true);
+  }
 
-    if (priceInput === null) {
-      return;
+  async function handleEditSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!editingProduct) return;
+
+    setError("");
+    setMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const headers = await getHeaders();
+      if (!headers) return;
+
+      const payload = {
+        productId: editingProduct.id,
+        name: editName,
+        slug: editSlug,
+        description: editDescription,
+        price: Number(editPrice),
+        mrp: Number(editMrp),
+        tag: editTag,
+        isActive: editIsActive,
+        isFeatured: editIsFeatured,
+        seoTitle: editSeoTitle,
+        seoDescription: editSeoDescription,
+        categoryId: editCategoryId || null,
+        collectionId: editCollectionId || null,
+        features: editFeaturesText.split("\n").map(f => f.trim()).filter(Boolean),
+        stock: Number(editStock),
+      };
+
+      const res = await fetch("/api/admin/catalog", {
+        method: "PATCH",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json() as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update product.");
+      }
+
+      setMessage(`${editName} updated successfully.`);
+      setIsEditModalOpen(false);
+      setEditingProduct(null);
+      await loadAdminData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error updating product.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const tagInput = window.prompt("Badge/tag", product.tag ?? "");
-
-    if (tagInput === null) {
-      return;
-    }
-
-    const stockInput = window.prompt(
-      "Stock for every variant",
-      String(product.selectedModel?.stock ?? 25),
-    );
-
-    if (stockInput === null) {
-      return;
-    }
-
-    const headers = await getHeaders();
-
-    if (!headers) {
-      return;
-    }
-
-    const response = await fetch("/api/admin/catalog", {
-      method: "PATCH",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        productId: product.id,
-        price: Number(priceInput),
-        tag: tagInput,
-        stock: Number(stockInput),
-      }),
-    });
-    const result = (await response.json()) as { error?: string };
-
-    if (!response.ok) {
-      setError(result.error ?? "Could not update product.");
-      return;
-    }
-
-    setMessage(`${product.name} updated.`);
-    await loadAdminData();
   }
 
   async function deleteProduct(product: Product) {
@@ -529,6 +604,26 @@ export default function AdminPage() {
             >
               Logout
             </button>
+          </div>
+        </div>
+
+        {/* Stats Section */}
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="rounded-3xl border border-border bg-card p-5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Total Products</p>
+            <p className="mt-2 text-2xl font-bold font-mono">{stats.total}</p>
+          </div>
+          <div className="rounded-3xl border border-border bg-card p-5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Active Catalog</p>
+            <p className="mt-2 text-2xl font-bold font-mono text-emerald-500">{stats.active}</p>
+          </div>
+          <div className="rounded-3xl border border-border bg-card p-5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Out of Stock</p>
+            <p className="mt-2 text-2xl font-bold font-mono text-rose-500">{stats.outOfStock}</p>
+          </div>
+          <div className="rounded-3xl border border-border bg-card p-5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Featured Items</p>
+            <p className="mt-2 text-2xl font-bold font-mono text-amber-500">{stats.featured}</p>
           </div>
         </div>
 
@@ -798,9 +893,30 @@ export default function AdminPage() {
 
           <div className="grid gap-6">
             <section className="rounded-3xl border border-border bg-card p-6">
-              <h2 className="text-2xl font-bold">Products</h2>
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <h2 className="text-2xl font-bold">Products</h2>
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Search catalog..."
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    className="h-9 w-44 rounded-full border border-border bg-background px-4 text-xs outline-none focus:border-foreground/40 transition"
+                  />
+                  <select
+                    value={productCategoryFilter}
+                    onChange={(e) => setProductCategoryFilter(e.target.value)}
+                    className="h-9 rounded-full border border-border bg-background px-3 text-xs outline-none"
+                  >
+                    <option value="all">All Categories</option>
+                    {categories.map((c) => (
+                      <option key={c.slug} value={c.slug}>{c.title}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
               <div className="mt-5 grid gap-3">
-                {(catalog?.products ?? []).map((product) => (
+                {filteredProducts.map((product) => (
                   <article
                     key={product.id}
                     className="grid grid-cols-[64px_1fr_auto] gap-4 rounded-2xl border border-border p-3"
@@ -834,7 +950,7 @@ export default function AdminPage() {
                       </Link>
                       <button
                         className="h-9 rounded-full border border-border px-3 text-xs"
-                        onClick={() => quickEditProduct(product)}
+                        onClick={() => openEditModal(product)}
                       >
                         Edit
                       </button>
@@ -903,6 +1019,219 @@ export default function AdminPage() {
           </div>
         </div>
       </section>
+
+      {/* Interactive Edit Modal */}
+      {isEditModalOpen && editingProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-md">
+          <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card/90 p-6 shadow-2xl backdrop-blur-xl md:p-8">
+            <div className="flex items-center justify-between border-b border-border pb-4">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Edit Product</span>
+                <h3 className="text-xl font-bold">{editingProduct.name}</h3>
+              </div>
+              <button
+                onClick={() => setIsEditModalOpen(false)}
+                className="rounded-full border border-border p-2 hover:border-foreground/35 transition"
+              >
+                <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="mt-6 grid gap-6">
+              {/* General details */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Product Name
+                  <input
+                    required
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="h-11 rounded-2xl border border-border bg-background px-4 text-sm font-medium text-foreground outline-none focus:border-foreground/45"
+                  />
+                </label>
+
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Product Slug
+                  <input
+                    required
+                    value={editSlug}
+                    onChange={(e) => setEditSlug(e.target.value)}
+                    className="h-11 rounded-2xl border border-border bg-background px-4 text-sm font-medium text-foreground outline-none focus:border-foreground/45"
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Category
+                  <select
+                    value={editCategoryId}
+                    onChange={(e) => setEditCategoryId(e.target.value)}
+                    className="h-11 rounded-2xl border border-border bg-background px-4 text-sm text-foreground outline-none focus:border-foreground/45"
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.title}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Collection
+                  <select
+                    value={editCollectionId}
+                    onChange={(e) => setEditCollectionId(e.target.value)}
+                    className="h-11 rounded-2xl border border-border bg-background px-4 text-sm text-foreground outline-none focus:border-foreground/45"
+                  >
+                    <option value="">Select Collection</option>
+                    {(catalog?.collections ?? []).map((col) => (
+                      <option key={col.id} value={col.id}>
+                        {col.title}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              {/* Pricing & Stock */}
+              <div className="grid gap-4 sm:grid-cols-3">
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Price (INR)
+                  <input
+                    required
+                    type="number"
+                    value={editPrice}
+                    onChange={(e) => setEditPrice(Number(e.target.value))}
+                    className="h-11 rounded-2xl border border-border bg-background px-4 text-sm font-medium text-foreground outline-none focus:border-foreground/45"
+                  />
+                </label>
+
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  MRP (INR)
+                  <input
+                    required
+                    type="number"
+                    value={editMrp}
+                    onChange={(e) => setEditMrp(Number(e.target.value))}
+                    className="h-11 rounded-2xl border border-border bg-background px-4 text-sm font-medium text-foreground outline-none focus:border-foreground/45"
+                  />
+                </label>
+
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Badge / Tag
+                  <input
+                    value={editTag}
+                    onChange={(e) => setEditTag(e.target.value)}
+                    className="h-11 rounded-2xl border border-border bg-background px-4 text-sm font-medium text-foreground outline-none focus:border-foreground/45"
+                    placeholder="e.g. New, Hot"
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Global Stock per Variant
+                  <input
+                    required
+                    type="number"
+                    value={editStock}
+                    onChange={(e) => setEditStock(Number(e.target.value))}
+                    className="h-11 rounded-2xl border border-border bg-background px-4 text-sm font-medium text-foreground outline-none focus:border-foreground/45"
+                  />
+                </label>
+
+                <div className="flex items-center gap-6 pt-5">
+                  <label className="flex items-center gap-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={editIsActive}
+                      onChange={(e) => setEditIsActive(e.target.checked)}
+                      className="size-4 rounded border-border text-foreground focus:ring-0"
+                    />
+                    Is Active
+                  </label>
+
+                  <label className="flex items-center gap-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={editIsFeatured}
+                      onChange={(e) => setEditIsFeatured(e.target.checked)}
+                      className="size-4 rounded border-border text-foreground focus:ring-0"
+                    />
+                    Is Featured
+                  </label>
+                </div>
+              </div>
+
+              {/* Description */}
+              <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Product Description
+                <textarea
+                  rows={3}
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground outline-none focus:border-foreground/45 resize-none"
+                />
+              </label>
+
+              {/* Bullet Features list */}
+              <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Features list (one per line)
+                <textarea
+                  rows={3}
+                  value={editFeaturesText}
+                  onChange={(e) => setEditFeaturesText(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground outline-none focus:border-foreground/45 resize-none font-mono"
+                  placeholder="e.g. 3m Drop Protection&#10;Tactile aluminum buttons&#10;MagSafe Snaps array"
+                />
+              </label>
+
+              {/* SEO details */}
+              <div className="grid gap-4 sm:grid-cols-2 border-t border-border pt-4">
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  SEO Title
+                  <input
+                    value={editSeoTitle}
+                    onChange={(e) => setEditSeoTitle(e.target.value)}
+                    className="h-11 rounded-2xl border border-border bg-background px-4 text-sm font-medium text-foreground outline-none focus:border-foreground/45"
+                  />
+                </label>
+
+                <label className="grid gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  SEO Description
+                  <textarea
+                    rows={2}
+                    value={editSeoDescription}
+                    onChange={(e) => setEditSeoDescription(e.target.value)}
+                    className="w-full rounded-2xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground outline-none focus:border-foreground/45 resize-none"
+                  />
+                </label>
+              </div>
+
+              <div className="flex justify-end gap-3 border-t border-border pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="h-10 rounded-full border border-border px-6 text-sm font-semibold hover:border-foreground/35 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="h-10 rounded-full bg-foreground px-6 text-sm font-semibold text-background hover:opacity-90 transition disabled:opacity-50"
+                >
+                  {isSubmitting ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

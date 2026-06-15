@@ -13,7 +13,6 @@ import {
   AlertCircle,
   PlusCircle,
   User,
-  MapPin,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getSupabaseBrowserClientAsync } from "@/lib/supabase/browser";
@@ -23,7 +22,7 @@ type AdminReview = {
   productId: string;
   productName: string;
   name: string;
-  city: string;
+  city?: string;
   rating: number;
   quote: string;
   isApproved: boolean;
@@ -48,7 +47,6 @@ export default function AdminReviewsPage() {
   const [isAdding, setIsAdding] = useState(false);
   const [formProductId, setFormProductId] = useState("");
   const [formName, setFormName] = useState("");
-  const [formCity, setFormCity] = useState("");
   const [formRating, setFormRating] = useState(5);
   const [formQuote, setFormQuote] = useState("");
   const [submittingForm, setSubmittingForm] = useState(false);
@@ -149,7 +147,7 @@ export default function AdminReviewsPage() {
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formProductId || !formName || !formCity || !formQuote) {
+    if (!formProductId || !formName || !formQuote) {
       alert("Please fill out all fields");
       return;
     }
@@ -166,7 +164,7 @@ export default function AdminReviewsPage() {
         body: JSON.stringify({
           productId: formProductId,
           name: formName,
-          city: formCity,
+          city: "",
           rating: formRating,
           quote: formQuote,
           isApproved: true, // Auto approve when created by admin
@@ -180,7 +178,6 @@ export default function AdminReviewsPage() {
 
       // Reload data
       setFormName("");
-      setFormCity("");
       setFormQuote("");
       setFormRating(5);
       setIsAdding(false);
@@ -198,8 +195,7 @@ export default function AdminReviewsPage() {
       const matchesSearch =
         rev.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         rev.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        rev.quote.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        rev.city.toLowerCase().includes(searchQuery.toLowerCase());
+        rev.quote.toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesStatus =
         statusFilter === "all" ||
@@ -312,19 +308,6 @@ export default function AdminReviewsPage() {
                   className="mt-2 h-11 w-full rounded-xl border border-border bg-background px-4 text-sm outline-none focus:border-foreground/45"
                 />
               </label>
-
-              <label className="block">
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  City
-                </span>
-                <input
-                  required
-                  placeholder="e.g. Mumbai"
-                  value={formCity}
-                  onChange={(e) => setFormCity(e.target.value)}
-                  className="mt-2 h-11 w-full rounded-xl border border-border bg-background px-4 text-sm outline-none focus:border-foreground/45"
-                />
-              </label>
             </div>
 
             <label className="block">
@@ -378,7 +361,7 @@ export default function AdminReviewsPage() {
           </span>
           <input
             type="text"
-            placeholder="Search reviews by product name, reviewer name, content, city..."
+            placeholder="Search reviews by product name, reviewer name, or content..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="h-12 w-full rounded-2xl border border-border bg-card/65 pl-11 pr-4 text-sm outline-none focus:border-foreground/40 transition"
@@ -442,10 +425,6 @@ export default function AdminReviewsPage() {
                     <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1">
                       <User className="size-3" />
                       {review.name}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
-                      <MapPin className="size-3" />
-                      {review.city}
                     </p>
                     <p className="mt-2 text-xs font-semibold text-foreground truncate">
                       {review.productName}

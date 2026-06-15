@@ -5,7 +5,6 @@ import type { Product } from "@/data/products";
 
 export type ProductReview = {
   name: string;
-  city: string;
   rating: number;
   quote: string;
 };
@@ -21,20 +20,17 @@ export function getStaticProductReviews(product: Product): ProductReview[] {
     return [
       {
         name: "Rohan P.",
-        city: "Delhi",
         rating: 5,
         quote: `The ${product.name} glass lined up perfectly on my ${fit}. Touch still feels smooth.`,
       },
       {
         name: "Meera K.",
-        city: "Mumbai",
         rating: 5,
         quote:
           "No bubbles after install, and the display still looks sharp. Exactly what I needed.",
       },
       {
         name: "Ishaan G.",
-        city: "Pune",
         rating: 4,
         quote: "Case-friendly edges are the main win. My cover does not lift the glass.",
       },
@@ -45,19 +41,16 @@ export function getStaticProductReviews(product: Product): ProductReview[] {
     return [
       {
         name: "Kabir S.",
-        city: "Jaipur",
         rating: 5,
         quote: `The lens guard fits cleanly on my ${fit}. Photos still look clear.`,
       },
       {
         name: "Ananya R.",
-        city: "Bengaluru",
         rating: 5,
         quote: "Easy to align and the camera bump feels safer in daily use.",
       },
       {
         name: "Dev M.",
-        city: "Kochi",
         rating: 4,
         quote: "Good protection without making the camera area bulky.",
       },
@@ -68,19 +61,16 @@ export function getStaticProductReviews(product: Product): ProductReview[] {
     return [
       {
         name: "Arjun V.",
-        city: "Chennai",
         rating: 5,
         quote: `${product.name} snaps well on my MagSafe case and carries my two cards cleanly.`,
       },
       {
         name: "Tanya B.",
-        city: "Hyderabad",
         rating: 5,
         quote: "The finish feels premium and it is slimmer than the wallet I used before.",
       },
       {
         name: "Nikhil J.",
-        city: "Mumbai",
         rating: 4,
         quote: "Strong enough for daily carry. I remove it before charging and it works fine.",
       },
@@ -91,19 +81,16 @@ export function getStaticProductReviews(product: Product): ProductReview[] {
     return [
       {
         name: "Samar A.",
-        city: "Ahmedabad",
         rating: 5,
         quote: `${product.name} feels practical, compact, and easy to carry with the rest of my iPhone setup.`,
       },
       {
         name: "Priya N.",
-        city: "Lucknow",
         rating: 5,
         quote: "Good finish and simple packaging. It does what it says without fuss.",
       },
       {
         name: "Ritvik C.",
-        city: "Indore",
         rating: 4,
         quote: "Solid everyday accessory. Delivery was faster than expected.",
       },
@@ -113,19 +100,16 @@ export function getStaticProductReviews(product: Product): ProductReview[] {
   return [
     {
       name: "Aarav S.",
-      city: "Mumbai",
       rating: 5,
       quote: `Lightest case I have owned. The ${product.name.toLowerCase()} finish matches the iPhone frame beautifully.`,
     },
     {
       name: "Diya M.",
-      city: "Bengaluru",
       rating: 5,
       quote: "Dropped my phone on marble. Not a scratch. Worth every rupee.",
     },
     {
       name: "Vivaan R.",
-      city: "Delhi",
       rating: 5,
       quote: `The fit on my ${fit} is exact, and the buttons still feel clicky.`,
     },
@@ -145,7 +129,6 @@ export async function getProductReviews(product: Product): Promise<ProductReview
       if (dbReviews.length > 0) {
         return dbReviews.map((r) => ({
           name: r.name,
-          city: r.city,
           rating: r.rating,
           quote: r.quote,
         }));

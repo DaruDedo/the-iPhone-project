@@ -58,13 +58,13 @@ export async function POST(request: Request) {
   const body = (await request.json()) as {
     productId: string;
     name: string;
-    city: string;
+    city?: string;
     rating: number;
     quote: string;
     isApproved?: boolean;
   };
 
-  if (!body.productId || !body.name || !body.city || !body.rating || !body.quote) {
+  if (!body.productId || !body.name || !body.rating || !body.quote) {
     return NextResponse.json({ error: "Missing required review fields." }, { status: 400 });
   }
 
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
       .values({
         productId: body.productId,
         name: body.name,
-        city: body.city,
+        city: body.city || "",
         rating: Math.min(5, Math.max(1, body.rating)),
         quote: body.quote,
         isApproved: body.isApproved ?? true,

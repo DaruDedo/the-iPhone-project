@@ -11,19 +11,16 @@ import { absoluteUrl, JsonLd, productJsonLd } from "@/lib/seo";
 const reviews = [
   {
     name: "Aarav S.",
-    city: "Mumbai",
     text: "Lightest case I've owned. The Cosmic Orange finish looks made for the phone.",
     rating: 5,
   },
   {
     name: "Diya M.",
-    city: "Bengaluru",
     text: "Dropped my 17 Pro on marble. Not a scratch. The grip is excellent.",
     rating: 5,
   },
   {
     name: "Kabir R.",
-    city: "Delhi",
     text: "MagSafe snaps perfectly. Charging is cleaner than with my old case.",
     rating: 5,
   },
@@ -82,7 +79,7 @@ function ProductGridSection({
         </div>
         <Link
           href={seeAllHref}
-          className="rounded-full border border-border px-5 py-2 text-sm font-medium transition hover:border-foreground/35"
+          className="hidden sm:inline-block rounded-full border border-border px-5 py-2 text-sm font-medium transition hover:border-foreground/35"
         >
           See all
         </Link>
@@ -92,6 +89,15 @@ function ProductGridSection({
         {products.slice(0, 4).map((product) => (
           <ProductCard key={`${id}-${product.slug}`} product={product} />
         ))}
+      </div>
+
+      <div className="mt-8 flex justify-center sm:hidden">
+        <Link
+          href={seeAllHref}
+          className="w-full text-center rounded-full border border-border px-5 py-2.5 text-sm font-medium transition hover:border-foreground/35 bg-card"
+        >
+          See all
+        </Link>
       </div>
     </section>
   );
@@ -136,7 +142,7 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <JsonLd data={homeJsonLd} />
-      <section className="overflow-hidden bg-black text-white">
+      <section className="overflow-hidden bg-black text-white -mt-[68px] pt-[68px] md:-mt-[76px] md:pt-[76px]">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-2 px-4 py-6 lg:min-h-[560px] lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-8 lg:px-6 lg:pb-8 lg:pt-0">
           <div className="relative order-1 mx-auto aspect-square w-full max-w-[500px] overflow-hidden rounded-[2rem] lg:order-2">
             <Image
@@ -434,7 +440,7 @@ export default async function Home() {
                 <div className="mt-6 border-t border-border pt-4">
                   <p className="text-sm font-bold">{review.name}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {review.city} / Verified buyer
+                    Verified buyer
                   </p>
                 </div>
               </div>

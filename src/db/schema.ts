@@ -285,7 +285,7 @@ export const productReviews = pgTable("product_reviews", {
     .notNull()
     .references(() => products.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
-  city: text("city").notNull(),
+  city: text("city").notNull().default(""),
   rating: integer("rating").notNull(),
   quote: text("quote").notNull(),
   isApproved: boolean("is_approved").notNull().default(false),

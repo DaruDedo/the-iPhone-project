@@ -24,9 +24,9 @@ export async function ProductReviews({ product }: { product: Product }) {
       </div>
 
       <div className="mt-10 grid gap-5 md:grid-cols-3">
-        {reviews.map((review) => (
+        {reviews.map((review, index) => (
           <article
-            key={`${review.name}-${review.city}`}
+            key={`${review.name}-${index}`}
             className="rounded-3xl border border-border bg-card/80 p-7"
           >
             <Stars rating={review.rating} />
@@ -36,7 +36,7 @@ export async function ProductReviews({ product }: { product: Product }) {
             <p className="mt-5 text-sm text-muted-foreground">
               <span className="font-semibold text-foreground">{review.name}</span>
               <span className="mx-2">·</span>
-              {review.city}
+              Verified buyer
             </p>
           </article>
         ))}

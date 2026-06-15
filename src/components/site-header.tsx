@@ -149,20 +149,11 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <header
-        className={`sticky top-0 z-50 w-full pb-3 transition-colors duration-300 ${
-          floatingOverPage ? "bg-transparent" : "bg-black"
-        }`}
-      >
-        <div className="relative mx-auto hidden h-16 w-[calc(100%-2.5rem)] max-w-7xl items-center justify-between rounded-b-[2rem] rounded-t-none border border-white/45 border-t-0 bg-white/58 px-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.85),inset_0_-18px_42px_rgba(255,255,255,0.24),0_18px_55px_rgba(0,0,0,0.24),0_0_34px_rgba(255,85,0,0.22)] backdrop-blur-2xl transition-all duration-500 before:absolute before:inset-0 before:rounded-b-[2rem] before:bg-[radial-gradient(circle_at_12%_0%,rgba(255,255,255,0.92),transparent_34%),radial-gradient(circle_at_88%_100%,rgba(255,85,0,0.28),transparent_32%)] before:opacity-80 after:absolute after:inset-x-8 after:top-0 after:h-px after:bg-white/90 hover:bg-white/68 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-18px_42px_rgba(255,255,255,0.3),0_22px_70px_rgba(0,0,0,0.3),0_0_42px_rgba(255,85,0,0.28)] md:flex">
-          <div className="pointer-events-none absolute bottom-0 left-1/2 z-0 h-px w-2/5 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#ff5500]/70 to-transparent blur-[0.5px]" />
-          <div className="pointer-events-none absolute -bottom-[2px] left-1/2 z-0 h-[3px] w-16 -translate-x-1/2 animate-pulse rounded-full bg-[#ff5500] shadow-[0_0_18px_#ff5500]" />
+      <header className="sticky top-0 z-50 w-full pb-3 bg-transparent">
+        <div className="relative mx-auto hidden h-16 w-[calc(100%-2.5rem)] max-w-7xl items-center justify-between rounded-b-[2rem] rounded-t-none border border-white/45 border-t-0 bg-white/70 px-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-18px_42px_rgba(255,255,255,0.25),0_18px_55px_rgba(0,0,0,0.08),0_0_34px_rgba(255,255,255,0.5)] backdrop-blur-2xl transition-all duration-500 before:absolute before:inset-0 before:rounded-b-[2rem] before:bg-[radial-gradient(circle_at_12%_0%,rgba(255,255,255,0.95),transparent_34%),radial-gradient(circle_at_88%_100%,rgba(255,255,255,0.4),transparent_32%)] before:opacity-85 after:absolute after:inset-x-8 after:top-0 after:h-px after:bg-white/95 hover:bg-white/78 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-18px_42px_rgba(255,255,255,0.3),0_22px_70px_rgba(0,0,0,0.12),0_0_42px_rgba(255,255,255,0.6)] md:flex">
+          <div className="pointer-events-none absolute bottom-0 left-8 right-8 z-0 h-px bg-gradient-to-r from-[#ff5500]/20 via-[#ff5500]/65 to-[#ff5500]/20 blur-[0.5px]" />
 
           <div className="relative z-10 flex shrink-0 items-center justify-center rounded-2xl border border-white/55 bg-white/30 px-5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_8px_22px_rgba(0,0,0,0.08)] backdrop-blur-xl">
-            <div className="absolute left-1 top-1 h-1.5 w-1.5 border-l border-t border-[#ff5500]/70" />
-            <div className="absolute right-1 top-1 h-1.5 w-1.5 border-r border-t border-[#ff5500]/70" />
-            <div className="absolute bottom-1 left-1 h-1.5 w-1.5 border-b border-l border-[#ff5500]/70" />
-            <div className="absolute bottom-1 right-1 h-1.5 w-1.5 border-b border-r border-[#ff5500]/70" />
             <Link
               href="/"
               className="select-none text-[13px]"
@@ -196,7 +187,7 @@ export function SiteHeader() {
                   <div
                     onMouseEnter={openShopMenu}
                     onMouseLeave={scheduleShopClose}
-                    className="grid grid-cols-3 gap-4 rounded-[1.8rem] border border-white/60 bg-white/80 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_28px_70px_rgba(0,0,0,0.24),0_0_42px_rgba(255,85,0,0.16)] backdrop-blur-2xl"
+                    className="grid grid-cols-3 gap-4 rounded-[1.8rem] border border-white/60 bg-white/96 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_28px_70px_rgba(0,0,0,0.24),0_0_42px_rgba(255,85,0,0.16)] backdrop-blur-2xl"
                   >
                     {shopMenuGroups.map((group) => (
                       <div key={group.title}>
@@ -253,10 +244,10 @@ export function SiteHeader() {
           <div className="relative z-10 flex shrink-0 items-center gap-2">
             <button
               onClick={() => setDesktopSearchOpen(!desktopSearchOpen)}
-              className={`grid size-9 place-items-center rounded-full border transition-all focus:outline-none ${
+              className={`grid size-9 place-items-center rounded-full border transition-all focus:outline-none shadow-sm ${
                 desktopSearchOpen
-                  ? "border-[#ff5500]/30 bg-[#ff5500]/10 text-[#ff5500] shadow-[0_0_8px_rgba(255,85,0,0.1)]"
-                  : "border-transparent text-foreground hover:border-white/45 hover:bg-white/35"
+                  ? "border-[#ff5500]/30 bg-[#ff5500]/15 text-[#ff5500] shadow-[0_0_8px_rgba(255,85,0,0.1)]"
+                  : "border-white/80 bg-white text-foreground hover:bg-neutral-50 hover:border-white"
               }`}
             >
               <Search size={15} />
@@ -264,18 +255,18 @@ export function SiteHeader() {
             <div className="mx-1 h-5 w-px bg-white/45 shadow-[1px_0_0_rgba(0,0,0,0.08)]" />
             <Link
               href="/admin"
-              className="grid size-9 place-items-center rounded-full border border-transparent text-foreground transition-all hover:border-white/45 hover:bg-white/35"
+              className="grid size-9 place-items-center rounded-full border border-white/80 bg-white text-foreground transition-all hover:bg-neutral-50 hover:border-white shadow-sm"
             >
               <User size={15} />
             </Link>
             <button
               data-testid="open-cart"
               onClick={openCart}
-              className="flex h-9 items-center gap-1.5 rounded-full px-4 text-[11px] font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_12px_28px_rgba(255,85,0,0.34)] hover:bg-[#ff6a1f] focus:outline-none transition-all duration-300 font-sans border border-white/60 bg-[#ff5500]"
+              className="flex h-9 items-center gap-1.5 rounded-full px-4 text-[12px] font-semibold text-[#ff5500] border border-[#ff5500] bg-white transition-all duration-300 hover:bg-[#ff5500]/5 hover:shadow-[0_0_12px_rgba(255,85,0,0.15)] focus:outline-none font-sans"
             >
-              <ShoppingBag size={13} className="shrink-0" />
+              <ShoppingBag size={13} className="shrink-0 text-[#ff5500]" />
               <span className="leading-none">Bag</span>
-              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-white text-[10.5px] font-bold text-[#ff5500] leading-none pt-[1px]">
+              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#ff5500] text-[10px] font-bold text-white leading-none pt-[0.5px]">
                 {itemCount}
               </span>
             </button>
@@ -283,7 +274,7 @@ export function SiteHeader() {
 
           {desktopSearchOpen && (
             <div className="pointer-events-auto absolute left-1/2 top-[115%] z-50 w-[480px] -translate-x-1/2">
-              <div className="flex items-center gap-2 rounded-2xl border border-white/60 bg-white/78 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_18px_50px_rgba(0,0,0,0.2)] backdrop-blur-2xl">
+              <div className="flex items-center gap-2 rounded-2xl border border-white/60 bg-white/96 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_18px_50px_rgba(0,0,0,0.2)] backdrop-blur-2xl">
                 <div className="relative flex-1">
                   <Search
                     size={14}
@@ -314,9 +305,8 @@ export function SiteHeader() {
           )}
         </div>
 
-        <div className="relative mx-auto flex h-14 w-[calc(100%-1.25rem)] items-center justify-between overflow-hidden rounded-b-2xl rounded-t-none border border-white/45 border-t-0 bg-white/62 px-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_12px_38px_rgba(0,0,0,0.22),0_0_24px_rgba(255,85,0,0.18)] backdrop-blur-2xl before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.95),transparent_38%),radial-gradient(circle_at_90%_100%,rgba(255,85,0,0.28),transparent_34%)] before:opacity-80 md:hidden">
-          <div className="pointer-events-none absolute bottom-0 left-1/2 z-0 h-px w-1/2 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#ff5500]/55 to-transparent blur-[0.5px]" />
-          <div className="pointer-events-none absolute -bottom-[1.5px] left-1/2 z-0 h-[2.5px] w-10 -translate-x-1/2 animate-pulse rounded-full bg-[#ff5500] shadow-[0_0_12px_#ff5500]" />
+        <div className="relative mx-auto flex h-14 w-[calc(100%-1.25rem)] items-center justify-between overflow-hidden rounded-b-2xl rounded-t-none border border-white/45 border-t-0 bg-white/72 px-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_38px_rgba(0,0,0,0.08),0_0_24px_rgba(255,255,255,0.4)] backdrop-blur-2xl before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.95),transparent_38%),radial-gradient(circle_at_90%_100%,rgba(255,255,255,0.4),transparent_34%)] before:opacity-85 md:hidden">
+          <div className="pointer-events-none absolute bottom-0 left-4 right-4 z-0 h-px bg-gradient-to-r from-[#ff5500]/20 via-[#ff5500]/60 to-[#ff5500]/20 blur-[0.5px]" />
           <button
             aria-label="Open navigation"
             className="relative z-10 grid size-10 shrink-0 place-items-center rounded-full border border-white/60 bg-white/38 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_8px_18px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-all hover:bg-white/55 focus:outline-none"
@@ -333,11 +323,11 @@ export function SiteHeader() {
           </Link>
           <button
             onClick={openCart}
-            className="relative z-10 flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-white/60 bg-[#ff5500] px-3.5 text-[11px] font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_10px_22px_rgba(255,85,0,0.3)] transition-all hover:bg-[#ff6a1f] focus:outline-none font-sans"
+            className="relative z-10 flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-[#ff5500] bg-white px-3.5 text-[12px] font-semibold text-[#ff5500] shadow-sm transition-all hover:bg-[#ff5500]/5 focus:outline-none font-sans"
           >
-            <ShoppingBag size={12} className="shrink-0" />
-            <span className="leading-none">Bag</span>
-            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-white text-[10.5px] font-bold text-[#ff5500] leading-none pt-[1px]">
+            <ShoppingBag size={12} className="shrink-0 text-[#ff5500]" />
+            <span className="max-[370px]:hidden leading-none">Bag</span>
+            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#ff5500] text-[10px] font-bold text-white leading-none pt-[0.5px]">
               {itemCount}
             </span>
           </button>
@@ -602,15 +592,15 @@ export function SiteHeader() {
         {/* Bottom Sticky CTA Bar */}
         <div className="border-t border-border/40 bg-background px-6 pt-4 pb-2 shrink-0">
           <button
-            className="w-full flex h-11 items-center justify-center gap-2 rounded-full bg-foreground text-[11px] font-medium text-background hover:opacity-90 transition shadow-md font-sans"
+            className="w-full flex h-11 items-center justify-center gap-2 rounded-full border border-[#ff5500] bg-white text-[12px] font-semibold text-[#ff5500] hover:bg-[#ff5500]/5 transition shadow-sm font-sans"
             onClick={() => {
               setMobileOpen(false);
               openCart();
             }}
           >
-            <ShoppingBag size={14} className="shrink-0" />
+            <ShoppingBag size={14} className="shrink-0 text-[#ff5500]" />
             <span className="leading-none">View Bag</span>
-            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#ff5500] text-[10.5px] font-bold text-white leading-none pt-[1px]">
+            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#ff5500] text-[10px] font-bold text-white leading-none pt-[0.5px]">
               {itemCount}
             </span>
           </button>

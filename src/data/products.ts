@@ -38,6 +38,8 @@ export type Product = {
   name: string;
   category: string;
   categorySlug: string;
+  categoryId?: string;
+  collectionId?: string;
   requiresModelFit: boolean;
   defaultModelSlug: string;
   collection: string;
