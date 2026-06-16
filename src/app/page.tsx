@@ -439,9 +439,7 @@ export default async function Home() {
                 <p className="mt-4 text-base leading-relaxed">"{review.text}"</p>
                 <div className="mt-6 border-t border-border pt-4">
                   <p className="text-sm font-bold">{review.name}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Verified buyer
-                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">Verified buyer</p>
                 </div>
               </div>
             ))}

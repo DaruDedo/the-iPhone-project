@@ -2,7 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown, Menu, Search, ShoppingBag, Tag, User, X, ChevronRight, Package, Truck, Headphones } from "lucide-react";
+import {
+  ChevronDown,
+  Menu,
+  Search,
+  ShoppingBag,
+  Tag,
+  User,
+  X,
+  ChevronRight,
+  Package,
+  Truck,
+  Headphones,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
@@ -139,7 +151,10 @@ export function SiteHeader() {
         }
       `}</style>
 
-      <div className="h-6 overflow-hidden bg-foreground text-[10px] uppercase tracking-[0.22em] text-background" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+      <div
+        className="h-6 overflow-hidden bg-foreground text-[10px] uppercase tracking-[0.22em] text-background"
+        style={{ fontFamily: "'JetBrains Mono', monospace" }}
+      >
         <div className="flex h-full animate-[scroll_24s_linear_infinite] items-center gap-8 whitespace-nowrap">
           {Array.from({ length: 4 }).map((_, index) => (
             <span key={index} className="shrink-0">
@@ -336,13 +351,19 @@ export function SiteHeader() {
 
       <div
         className={`fixed inset-0 z-[100] flex flex-col justify-between bg-white transition-all duration-300 md:hidden ${
-          mobileOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+          mobileOpen
+            ? "translate-y-0 opacity-100"
+            : "-translate-y-full opacity-0 pointer-events-none"
         }`}
       >
         {/* Top Header Bar */}
         <div className="flex h-14 items-center justify-between border-b border-border/40 px-6 shrink-0">
-          <span className="text-[15px] font-bold tracking-tight text-foreground" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-            THE<span className="text-[#ff5500]">.I</span>PHONE<span className="text-[#ff5500]">.</span>PROJECT
+          <span
+            className="text-[15px] font-bold tracking-tight text-foreground"
+            style={{ fontFamily: "'JetBrains Mono', monospace" }}
+          >
+            THE<span className="text-[#ff5500]">.I</span>PHONE
+            <span className="text-[#ff5500]">.</span>PROJECT
           </span>
           <div className="flex items-center gap-2">
             <button
@@ -392,7 +413,6 @@ export function SiteHeader() {
 
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-          
           {/* Primary Navigation Links */}
           <div className="space-y-0.5">
             {primaryMenuLinks.map((link) => (
@@ -414,7 +434,6 @@ export function SiteHeader() {
               Explore Collections
             </p>
             <div className="grid grid-cols-2 gap-3">
-              
               {/* Frosted Air */}
               <Link
                 href="/collections/frosted-air"
@@ -562,7 +581,7 @@ export function SiteHeader() {
               </div>
               <ChevronRight size={13} className="text-muted-foreground" />
             </Link>
-            
+
             <Link
               href="/shipping"
               onClick={closeMobileMenu}
@@ -574,7 +593,7 @@ export function SiteHeader() {
               </div>
               <ChevronRight size={13} className="text-muted-foreground" />
             </Link>
-            
+
             <Link
               href="/contact"
               onClick={closeMobileMenu}

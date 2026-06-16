@@ -157,8 +157,11 @@ export async function PATCH(request: Request) {
       (typeof payload.price === "number" && payload.price > 0) ||
       (typeof payload.mrp === "number" && payload.mrp > 0)
     ) {
-      const variantUpdates: Record<string, any> = { updatedAt: new Date() };
-      if (typeof payload.price === "number" && payload.price > 0) variantUpdates.price = payload.price;
+      const variantUpdates: { price?: number; mrp?: number; updatedAt: Date } = {
+        updatedAt: new Date(),
+      };
+      if (typeof payload.price === "number" && payload.price > 0)
+        variantUpdates.price = payload.price;
       if (typeof payload.mrp === "number" && payload.mrp > 0) variantUpdates.mrp = payload.mrp;
 
       await db
@@ -190,14 +193,16 @@ export async function PATCH(request: Request) {
 
     // Sync features
     if (payload.features && Array.isArray(payload.features)) {
-      await db.delete(schema.productFeatures).where(eq(schema.productFeatures.productId, payload.productId));
+      await db
+        .delete(schema.productFeatures)
+        .where(eq(schema.productFeatures.productId, payload.productId));
       if (payload.features.length > 0) {
         await db.insert(schema.productFeatures).values(
           payload.features.map((featureLabel, idx) => ({
             productId: payload.productId!,
             label: featureLabel,
             sortOrder: idx,
-          }))
+          })),
         );
       }
     }

@@ -5,7 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
-import { formatPrice, type IphoneModel, type Product, type ProductCategory, type Collection } from "@/data/products";
+import {
+  formatPrice,
+  type IphoneModel,
+  type Product,
+  type ProductCategory,
+  type Collection,
+} from "@/data/products";
 import { nameFromFilename, slugifyProduct, type ProductTemplate } from "@/lib/product-templates";
 import { getSupabaseBrowserClientAsync } from "@/lib/supabase/browser";
 
@@ -494,7 +500,10 @@ export default function AdminPage() {
         seoDescription: editSeoDescription,
         categoryId: editCategoryId || null,
         collectionId: editCollectionId || null,
-        features: editFeaturesText.split("\n").map(f => f.trim()).filter(Boolean),
+        features: editFeaturesText
+          .split("\n")
+          .map((f) => f.trim())
+          .filter(Boolean),
         stock: Number(editStock),
       };
 
@@ -507,7 +516,7 @@ export default function AdminPage() {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json() as { error?: string };
+      const data = (await res.json()) as { error?: string };
       if (!res.ok) {
         throw new Error(data.error || "Failed to update product.");
       }
@@ -610,19 +619,27 @@ export default function AdminPage() {
         {/* Stats Section */}
         <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-3xl border border-border bg-card p-5">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Total Products</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Total Products
+            </p>
             <p className="mt-2 text-2xl font-bold font-mono">{stats.total}</p>
           </div>
           <div className="rounded-3xl border border-border bg-card p-5">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Active Catalog</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Active Catalog
+            </p>
             <p className="mt-2 text-2xl font-bold font-mono text-emerald-500">{stats.active}</p>
           </div>
           <div className="rounded-3xl border border-border bg-card p-5">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Out of Stock</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Out of Stock
+            </p>
             <p className="mt-2 text-2xl font-bold font-mono text-rose-500">{stats.outOfStock}</p>
           </div>
           <div className="rounded-3xl border border-border bg-card p-5">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Featured Items</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Featured Items
+            </p>
             <p className="mt-2 text-2xl font-bold font-mono text-amber-500">{stats.featured}</p>
           </div>
         </div>
@@ -910,7 +927,9 @@ export default function AdminPage() {
                   >
                     <option value="all">All Categories</option>
                     {categories.map((c) => (
-                      <option key={c.slug} value={c.slug}>{c.title}</option>
+                      <option key={c.slug} value={c.slug}>
+                        {c.title}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -1026,7 +1045,9 @@ export default function AdminPage() {
           <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card/90 p-6 shadow-2xl backdrop-blur-xl md:p-8">
             <div className="flex items-center justify-between border-b border-border pb-4">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Edit Product</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Edit Product
+                </span>
                 <h3 className="text-xl font-bold">{editingProduct.name}</h3>
               </div>
               <button
@@ -1034,7 +1055,12 @@ export default function AdminPage() {
                 className="rounded-full border border-border p-2 hover:border-foreground/35 transition"
               >
                 <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
