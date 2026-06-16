@@ -72,11 +72,17 @@ export async function POST(request: Request) {
       console.log(`[DEV MODE] OTP generated for ${cleanEmail}: ${code}`);
       return NextResponse.json({ success: true, devMode: true, code });
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error in OTP send route:", err);
+    let details = err instanceof Error ? err.message : String(err);
+    if (err && typeof err === "object") {
+      if (err.detail) details += " | Detail: " + err.detail;
+      if (err.hint) details += " | Hint: " + err.hint;
+      if (err.code) details += " | Code: " + err.code;
+    }
     return NextResponse.json({
       error: "Internal Server Error",
-      details: err instanceof Error ? err.message : String(err),
+      details,
     }, { status: 500 });
   }
 }
