@@ -269,7 +269,7 @@ export function SiteHeader() {
             </button>
             <div className="mx-1 h-5 w-px bg-white/45 shadow-[1px_0_0_rgba(0,0,0,0.08)]" />
             <Link
-              href="/admin"
+              href="/account"
               className="grid size-9 place-items-center rounded-full border border-white/80 bg-white text-foreground transition-all hover:bg-neutral-50 hover:border-white shadow-sm"
             >
               <User size={15} />

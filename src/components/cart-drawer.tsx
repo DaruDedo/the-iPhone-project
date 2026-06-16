@@ -12,6 +12,8 @@ import {
   ShoppingBag,
   Trash2,
   X,
+  Gift,
+  CheckCircle2,
 } from "lucide-react";
 
 import { getCartItemKey, useCart } from "@/components/cart-provider";
@@ -103,6 +105,142 @@ export function CartDrawer() {
             </div>
           ) : (
             <>
+              {/* Free Gift Milestones Progress Bar */}
+              {subtotal >= 1000 && (
+                <div className="border border-border/60 bg-background rounded-[16px] p-4 text-xs shadow-sm flex flex-col gap-3.5 shrink-0">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] uppercase font-bold tracking-[0.15em] text-muted-foreground/80 font-sans">
+                      Free Gift Milestones
+                    </span>
+                    <div className="font-sans text-[12px] text-foreground font-medium">
+                      {subtotal < 1699 ? (
+                        <span>
+                          Add{" "}
+                          <strong className="text-[#ff5500]">
+                            ₹{(1699 - subtotal).toLocaleString("en-IN")}
+                          </strong>{" "}
+                          more to unlock <strong className="text-[#ff5500]">Gift 1</strong>!
+                        </span>
+                      ) : subtotal < 2499 ? (
+                        <span className="text-emerald-700">
+                          🎉 <strong className="font-semibold">Gift 1 Unlocked!</strong> Add{" "}
+                          <strong className="text-[#ff5500]">
+                            ₹{(2499 - subtotal).toLocaleString("en-IN")}
+                          </strong>{" "}
+                          more for <strong className="text-[#ff5500]">Gift 2</strong>!
+                        </span>
+                      ) : (
+                        <span className="text-emerald-700 font-bold">
+                          🎉 Double Gift Bonanza! Gift 1 & Gift 2 are yours free!
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Progress Line */}
+                  <div className="relative mt-2 mb-1">
+                    <div className="h-2 w-full bg-secondary/80 rounded-full relative overflow-visible">
+                      {/* Filled Progress */}
+                      <div
+                        className="h-full rounded-full bg-[linear-gradient(90deg,#ff9d54_0%,#ff5500_100%)] transition-all duration-300"
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            Math.max(0, ((subtotal - 1000) / (2499 - 1000)) * 100),
+                          )}%`,
+                        }}
+                      />
+
+                      {/* Milestone 1 (1699) - Position: ~46.6% */}
+                      <div
+                        className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full p-0.5 border transition-all duration-300 ${
+                          subtotal >= 1699
+                            ? "bg-[#ff5500] border-[#ff5500] text-white scale-110 shadow-[0_0_8px_rgba(255,85,0,0.4)]"
+                            : "bg-white border-muted-foreground/35 text-muted-foreground"
+                        }`}
+                        style={{ left: `${((1699 - 1000) / (2499 - 1000)) * 100}%` }}
+                        title="Gift 1 at ₹1,699"
+                      >
+                        {subtotal >= 1699 ? (
+                          <CheckCircle2 size={8} />
+                        ) : (
+                          <div className="size-2 rounded-full bg-muted-foreground/30" />
+                        )}
+                      </div>
+
+                      {/* Milestone 2 (2499) - Position: 100% */}
+                      <div
+                        className={`absolute top-1/2 -translate-y-1/2 translate-x-1/2 right-0 rounded-full p-0.5 border transition-all duration-300 ${
+                          subtotal >= 2499
+                            ? "bg-[#ff5500] border-[#ff5500] text-white scale-110 shadow-[0_0_8px_rgba(255,85,0,0.4)]"
+                            : "bg-white border-muted-foreground/35 text-muted-foreground"
+                        }`}
+                        title="Gift 2 at ₹2,499"
+                      >
+                        {subtotal >= 2499 ? (
+                          <CheckCircle2 size={8} />
+                        ) : (
+                          <div className="size-2 rounded-full bg-muted-foreground/30" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Gifts Info Panel */}
+                  <div className="grid grid-cols-2 gap-3 mt-1 pt-2 border-t border-border/40">
+                    {/* Gift 1 info */}
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`p-1.5 rounded-lg ${
+                          subtotal >= 1699
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        <Gift size={14} />
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span
+                          className={`font-semibold text-[11px] truncate ${
+                            subtotal >= 1699 ? "text-emerald-700" : "text-muted-foreground"
+                          }`}
+                        >
+                          Gift 1 (₹1,699)
+                        </span>
+                        <span className="text-[9px] text-muted-foreground/75 truncate">
+                          Premium Cable Organizer
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Gift 2 info */}
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`p-1.5 rounded-lg ${
+                          subtotal >= 2499
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        <Gift size={14} />
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span
+                          className={`font-semibold text-[11px] truncate ${
+                            subtotal >= 2499 ? "text-emerald-700" : "text-muted-foreground"
+                          }`}
+                        >
+                          Gift 2 (₹2,499)
+                        </span>
+                        <span className="text-[9px] text-muted-foreground/75 truncate">
+                          MagSafe Metal Ring
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Cart Items List */}
               <div className="space-y-3.5">
                 {items.map((item, index) => {

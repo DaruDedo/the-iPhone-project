@@ -298,3 +298,18 @@ export const productReviewsRelations = relations(productReviews, ({ one }) => ({
     references: [products.id],
   }),
 }));
+
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").notNull().unique(),
+  name: text("name"),
+  phone: text("phone"),
+  address: text("address"),
+  pincode: text("pincode"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const usersRelations = relations(users, ({ many }) => ({
+  orders: many(orders),
+}));

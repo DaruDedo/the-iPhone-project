@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CreditCard, MapPin, ShieldCheck, Truck } from "lucide-react";
-import { useState, useMemo, type FormEvent } from "react";
+import { useState, useMemo, useEffect, type FormEvent } from "react";
 
 import { getCartItemKey, useCart } from "@/components/cart-provider";
+import { getSupabaseBrowserClientAsync } from "@/lib/supabase/browser";
 import { formatPrice } from "@/data/products";
 import { siteConfig } from "@/lib/site";
 
@@ -21,6 +22,72 @@ export default function CheckoutPage() {
     total: number;
     paymentMethod: string;
   } | null>(null);
+
+  // User Authentication pre-filling state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loggedInEmail, setLoggedInEmail] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    pincode: "",
+    address: "",
+  });
+
+  useEffect(() => {
+    async function checkUserSession() {
+      try {
+        const supabase = await getSupabaseBrowserClientAsync();
+        let token = "";
+        let email = "";
+
+        if (supabase) {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          if (session?.user?.email) {
+            token = session.access_token;
+            email = session.user.email;
+          }
+        } else {
+          // Dev Mode fallback
+          const localEmail = localStorage.getItem("mock_session_email");
+          if (localEmail) {
+            token = `mock_${localEmail}`;
+            email = localEmail;
+          }
+        }
+
+        if (token && email) {
+          setIsLoggedIn(true);
+          setLoggedInEmail(email);
+
+          // Fetch profile details from backend
+          const res = await fetch("/api/user/profile", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const profile = await res.json();
+            setFormData({
+              name: profile.name || "",
+              phone: profile.phone || "",
+              email: profile.email || email,
+              pincode: profile.pincode || "",
+              address: profile.address || "",
+            });
+          } else {
+            setFormData((prev) => ({
+              ...prev,
+              email: email,
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Error loading session on checkout page:", err);
+      }
+    }
+    checkUserSession();
+  }, []);
   const shipping = subtotal >= 999 || subtotal === 0 ? 0 : 99;
   const total = subtotal + shipping;
 
@@ -180,6 +247,12 @@ Please confirm my order!`;
                   <MapPin size={18} />
                   <h2 className="text-xl font-bold">Delivery details</h2>
                 </div>
+                {isLoggedIn && (
+                  <div className="mb-5 rounded-2xl bg-emerald-50 border border-emerald-100/50 p-3.5 text-xs text-emerald-800 font-sans">
+                    Logged in as <strong className="font-bold">{loggedInEmail}</strong>. Your
+                    shipping details are pre-filled.
+                  </div>
+                )}
                 <div className="grid gap-4 md:grid-cols-2">
                   {[
                     ["Full name", "Aarav Sharma", "name"],
@@ -194,6 +267,8 @@ Please confirm my order!`;
                       <input
                         name={name}
                         required
+                        value={formData[name as keyof typeof formData]}
+                        onChange={(e) => setFormData({ ...formData, [name]: e.target.value })}
                         placeholder={placeholder}
                         className="mt-2 h-12 w-full rounded-2xl border border-border bg-card px-4 text-sm outline-none focus:border-foreground/50"
                       />
@@ -207,6 +282,8 @@ Please confirm my order!`;
                       name="address"
                       required
                       rows={4}
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       placeholder="House number, street, area, city, state"
                       className="mt-2 w-full resize-none rounded-2xl border border-border bg-card px-4 py-3 text-sm outline-none focus:border-foreground/50"
                     />
