@@ -177,7 +177,7 @@ export default function AccountPage() {
 
       if (!otpRes.ok) {
         const otpErr = await otpRes.json();
-        setError(otpErr.error ?? "Failed to request verification code. Please try again.");
+        setError(otpErr.details ? `${otpErr.error}: ${otpErr.details}` : (otpErr.error ?? "Failed to request verification code. Please try again."));
         setActionLoading(false);
         return;
       }
@@ -219,7 +219,7 @@ export default function AccountPage() {
 
       if (!verifyRes.ok) {
         const verifyErr = await verifyRes.json();
-        setError(verifyErr.error ?? "Invalid OTP code. Please check again.");
+        setError(verifyErr.details ? `${verifyErr.error}: ${verifyErr.details}` : (verifyErr.error ?? "Invalid OTP code. Please check again."));
         setActionLoading(false);
         return;
       }
