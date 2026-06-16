@@ -138,50 +138,52 @@ export function CartDrawer() {
                   </div>
 
                   {/* Progress Line */}
-                  <div className="relative mt-2 mb-1">
-                    <div className="h-2 w-full bg-secondary/80 rounded-full relative overflow-visible">
+                  <div className="relative pt-4 pb-7 px-4">
+                    <div className="h-[4px] w-full bg-neutral-200 rounded-full relative">
                       {/* Filled Progress */}
                       <div
-                        className="h-full rounded-full bg-[linear-gradient(90deg,#ff9d54_0%,#ff5500_100%)] transition-all duration-300"
+                        className="h-full rounded-full bg-[#ff5500] transition-all duration-300"
                         style={{
-                          width: `${Math.min(
-                            100,
-                            Math.max(0, ((subtotal - 1000) / (2499 - 1000)) * 100),
-                          )}%`,
+                          width: `${Math.min(100, (subtotal / 2800) * 100)}%`,
                         }}
                       />
 
-                      {/* Milestone 1 (1699) - Position: ~46.6% */}
+                      {/* Milestone 1 (₹1,699) */}
                       <div
-                        className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full p-0.5 border transition-all duration-300 ${
-                          subtotal >= 1699
-                            ? "bg-[#ff5500] border-[#ff5500] text-white scale-110 shadow-[0_0_8px_rgba(255,85,0,0.4)]"
-                            : "bg-white border-muted-foreground/35 text-muted-foreground"
-                        }`}
-                        style={{ left: `${((1699 - 1000) / (2499 - 1000)) * 100}%` }}
-                        title="Gift 1 at ₹1,699"
+                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col items-center z-10"
+                        style={{ left: `${(1699 / 2800) * 100}%` }}
                       >
-                        {subtotal >= 1699 ? (
-                          <CheckCircle2 size={8} />
-                        ) : (
-                          <div className="size-2 rounded-full bg-muted-foreground/30" />
-                        )}
+                        <div
+                          className={`size-7 rounded-full border flex items-center justify-center transition-all duration-300 shadow-sm ${
+                            subtotal >= 1699
+                              ? "bg-[#ff5500] border-[#ff5500] text-white shadow-[0_0_8px_rgba(255,85,0,0.35)]"
+                              : "bg-white border-neutral-200 text-neutral-400"
+                          }`}
+                        >
+                          <Gift size={13} />
+                        </div>
+                        <span className="text-[10px] font-bold text-muted-foreground mt-2 font-sans leading-none">
+                          ₹1,699
+                        </span>
                       </div>
 
-                      {/* Milestone 2 (2499) - Position: 100% */}
+                      {/* Milestone 2 (₹2,499) */}
                       <div
-                        className={`absolute top-1/2 -translate-y-1/2 translate-x-1/2 right-0 rounded-full p-0.5 border transition-all duration-300 ${
-                          subtotal >= 2499
-                            ? "bg-[#ff5500] border-[#ff5500] text-white scale-110 shadow-[0_0_8px_rgba(255,85,0,0.4)]"
-                            : "bg-white border-muted-foreground/35 text-muted-foreground"
-                        }`}
-                        title="Gift 2 at ₹2,499"
+                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col items-center z-10"
+                        style={{ left: `${(2499 / 2800) * 100}%` }}
                       >
-                        {subtotal >= 2499 ? (
-                          <CheckCircle2 size={8} />
-                        ) : (
-                          <div className="size-2 rounded-full bg-muted-foreground/30" />
-                        )}
+                        <div
+                          className={`size-7 rounded-full border flex items-center justify-center transition-all duration-300 shadow-sm ${
+                            subtotal >= 2499
+                              ? "bg-[#ff5500] border-[#ff5500] text-white shadow-[0_0_8px_rgba(255,85,0,0.35)]"
+                              : "bg-white border-neutral-200 text-neutral-400"
+                          }`}
+                        >
+                          <Gift size={13} />
+                        </div>
+                        <span className="text-[10px] font-bold text-muted-foreground mt-2 font-sans leading-none">
+                          ₹2,499
+                        </span>
                       </div>
                     </div>
                   </div>
