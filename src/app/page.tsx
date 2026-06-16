@@ -143,8 +143,8 @@ export default async function Home() {
     <main className="min-h-screen bg-background text-foreground">
       <JsonLd data={homeJsonLd} />
       <section className="overflow-hidden bg-black text-white -mt-[68px] pt-[68px] md:-mt-[76px] md:pt-[76px]">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-2 px-4 py-6 lg:min-h-[560px] lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-8 lg:px-6 lg:pb-8 lg:pt-0">
-          <div className="relative order-1 mx-auto aspect-square w-full max-w-[500px] overflow-hidden rounded-[2rem] lg:order-2">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-2 px-4 py-6 lg:min-h-0 lg:grid-cols-[0.95fr_1.05fr] lg:items-start lg:gap-8 lg:px-6 lg:pb-8 lg:pt-6">
+          <div className="relative order-1 mx-auto aspect-square w-full max-w-[500px] overflow-hidden rounded-none lg:order-2">
             <Image
               src={heroImg}
               alt="iPhone wearing a cover from The iPhone Project"
@@ -156,7 +156,7 @@ export default async function Home() {
             <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/25 lg:bg-gradient-to-l lg:from-transparent lg:to-black/20" />
           </div>
 
-          <div className="order-2 flex flex-col justify-center px-1 py-5 sm:px-6 sm:py-10 lg:order-1 lg:px-6 lg:py-16">
+          <div className="order-2 flex flex-col justify-center px-1 py-5 sm:px-6 sm:py-10 lg:order-1 lg:px-6 lg:pt-0 lg:pb-8">
             <p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-white/60 sm:text-xs">
               New - Frosted Air Series
             </p>

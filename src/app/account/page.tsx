@@ -59,8 +59,6 @@ type Order = {
 
 export default function AccountPage() {
   const router = useRouter();
-  const [supabaseClient, setSupabaseClient] = useState<any>(null);
-  const [isSupabaseMode, setIsSupabaseMode] = useState(false);
   const [sessionUser, setSessionUser] = useState<{ email: string; token: string } | null>(null);
 
   // Authentication UI State
@@ -92,37 +90,17 @@ export default function AccountPage() {
   useEffect(() => {
     async function initAuth() {
       try {
-        const supabase = await getSupabaseBrowserClientAsync();
-        if (supabase) {
-          setSupabaseClient(supabase);
-          setIsSupabaseMode(true);
+        const localEmail = localStorage.getItem("user_session_email");
+        const localToken = localStorage.getItem("user_session_token");
 
-          const {
-            data: { session },
-          } = await supabase.auth.getSession();
-          if (session?.user?.email) {
-            setSessionUser({
-              email: session.user.email,
-              token: session.access_token,
-            });
-            await loadUserData(session.user.email, session.access_token);
-          } else {
-            setLoading(false);
-          }
+        if (localEmail && localToken) {
+          setSessionUser({
+            email: localEmail,
+            token: localToken,
+          });
+          await loadUserData(localEmail, localToken);
         } else {
-          // Fallback to local dev mode
-          setIsSupabaseMode(false);
-          const localEmail = localStorage.getItem("mock_session_email");
-          if (localEmail) {
-            const mockToken = `mock_${localEmail}`;
-            setSessionUser({
-              email: localEmail,
-              token: mockToken,
-            });
-            await loadUserData(localEmail, mockToken);
-          } else {
-            setLoading(false);
-          }
+          setLoading(false);
         }
       } catch (err) {
         console.error("Auth init error:", err);
@@ -190,18 +168,24 @@ export default function AccountPage() {
 
       setIsNewUser(checkData.isNew);
 
-      // Trigger OTP send
-      if (isSupabaseMode && supabaseClient) {
-        const { error: otpErr } = await supabaseClient.auth.signInWithOtp({ email });
-        if (otpErr) {
-          setError(otpErr.message);
-          setActionLoading(false);
-          return;
-        }
-      } else {
-        // Dev Mode: Generate a mock OTP code
-        const code = String(Math.floor(100000 + Math.random() * 900000));
-        setDevOtp(code);
+      // Trigger OTP send via backend API
+      const otpRes = await fetch("/api/auth/otp/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!otpRes.ok) {
+        const otpErr = await otpRes.json();
+        setError(otpErr.error ?? "Failed to request verification code. Please try again.");
+        setActionLoading(false);
+        return;
+      }
+
+      const otpData = await otpRes.json();
+      if (otpData.devMode && otpData.code) {
+        // Dev Mode: Generate a mock OTP code and show in UI
+        setDevOtp(otpData.code);
       }
 
       setStep("otp");
@@ -226,29 +210,26 @@ export default function AccountPage() {
     try {
       let verifiedToken = "";
 
-      if (isSupabaseMode && supabaseClient) {
-        const { data, error: verifyErr } = await supabaseClient.auth.verifyOtp({
-          email,
-          token: otpInput.trim(),
-          type: "email",
-        });
+      // Submit code to custom OTP verify API
+      const verifyRes = await fetch("/api/auth/otp/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code: otpInput.trim() }),
+      });
 
-        if (verifyErr || !data.session) {
-          setError(verifyErr?.message ?? "Invalid OTP code. Please check again.");
-          setActionLoading(false);
-          return;
-        }
-        verifiedToken = data.session.access_token;
-      } else {
-        // Dev Mode check
-        if (otpInput.trim() !== devOtp && otpInput.trim() !== "123456") {
-          setError("Invalid verification code. (Hint: Use the displayed code or 123456)");
-          setActionLoading(false);
-          return;
-        }
-        localStorage.setItem("mock_session_email", email);
-        verifiedToken = `mock_${email}`;
+      if (!verifyRes.ok) {
+        const verifyErr = await verifyRes.json();
+        setError(verifyErr.error ?? "Invalid OTP code. Please check again.");
+        setActionLoading(false);
+        return;
       }
+
+      const verifyData = await verifyRes.json();
+      verifiedToken = verifyData.token;
+
+      // Save custom JWT session in local storage
+      localStorage.setItem("user_session_email", email);
+      localStorage.setItem("user_session_token", verifiedToken);
 
       // If they are a new user, register their details now
       if (isNewUser) {
@@ -335,11 +316,9 @@ export default function AccountPage() {
   async function handleLogout() {
     setLoading(true);
     try {
-      if (isSupabaseMode && supabaseClient) {
-        await supabaseClient.auth.signOut();
-      } else {
-        localStorage.removeItem("mock_session_email");
-      }
+      localStorage.removeItem("user_session_email");
+      localStorage.removeItem("user_session_token");
+      
       setSessionUser(null);
       setProfile(null);
       setOrders([]);

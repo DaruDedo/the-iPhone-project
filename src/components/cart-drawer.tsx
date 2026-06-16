@@ -79,10 +79,6 @@ export function CartDrawer() {
               <X size={14} />
             </button>
           </div>
-          <p className="mt-1 text-[9px] font-bold tracking-[0.2em] text-muted-foreground uppercase flex items-center gap-1.5">
-            {String(itemCount).padStart(2, "0")} Items <span className="text-[#ff5500]">•</span>{" "}
-            Ready To Ship
-          </p>
         </div>
 
         {/* Scrollable Content Area */}
@@ -108,33 +104,28 @@ export function CartDrawer() {
               {/* Free Gift Milestones Progress Bar */}
               {subtotal >= 1000 && (
                 <div className="border border-border/60 bg-background rounded-[16px] p-4 text-xs shadow-sm flex flex-col gap-3.5 shrink-0">
-                  <div className="flex flex-col gap-1.5">
-                    <span className="text-[10px] uppercase font-bold tracking-[0.15em] text-muted-foreground/80 font-sans">
-                      Free Gift Milestones
-                    </span>
-                    <div className="font-sans text-[12px] text-foreground font-medium">
-                      {subtotal < 1699 ? (
-                        <span>
-                          Add{" "}
-                          <strong className="text-[#ff5500]">
-                            ₹{(1699 - subtotal).toLocaleString("en-IN")}
-                          </strong>{" "}
-                          more to unlock <strong className="text-[#ff5500]">Gift 1</strong>!
-                        </span>
-                      ) : subtotal < 2499 ? (
-                        <span className="text-emerald-700">
-                          🎉 <strong className="font-semibold">Gift 1 Unlocked!</strong> Add{" "}
-                          <strong className="text-[#ff5500]">
-                            ₹{(2499 - subtotal).toLocaleString("en-IN")}
-                          </strong>{" "}
-                          more for <strong className="text-[#ff5500]">Gift 2</strong>!
-                        </span>
-                      ) : (
-                        <span className="text-emerald-700 font-bold">
-                          🎉 Double Gift Bonanza! Gift 1 & Gift 2 are yours free!
-                        </span>
-                      )}
-                    </div>
+                  <div className="font-sans text-[12px] text-foreground font-medium">
+                    {subtotal < 1699 ? (
+                      <span>
+                        Add{" "}
+                        <strong className="text-[#ff5500]">
+                          ₹{(1699 - subtotal).toLocaleString("en-IN")}
+                        </strong>{" "}
+                        more to unlock <strong className="text-[#ff5500]">Gift 1</strong>!
+                      </span>
+                    ) : subtotal < 2499 ? (
+                      <span className="text-emerald-700">
+                        🎉 <strong className="font-semibold">Gift 1 Unlocked!</strong> Add{" "}
+                        <strong className="text-[#ff5500]">
+                          ₹{(2499 - subtotal).toLocaleString("en-IN")}
+                        </strong>{" "}
+                        more for <strong className="text-[#ff5500]">Gift 2</strong>!
+                      </span>
+                    ) : (
+                      <span className="text-emerald-700 font-bold">
+                        🎉 Double Gift Bonanza! Gift 1 & Gift 2 are yours free!
+                      </span>
+                    )}
                   </div>
 
                   {/* Progress Line */}
@@ -150,93 +141,44 @@ export function CartDrawer() {
 
                       {/* Milestone 1 (₹1,699) */}
                       <div
-                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col items-center z-10"
+                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 size-7"
                         style={{ left: `${(1699 / 2800) * 100}%` }}
                       >
-                        <div
-                          className={`size-7 rounded-full border flex items-center justify-center transition-all duration-300 shadow-sm ${
-                            subtotal >= 1699
-                              ? "bg-[#ff5500] border-[#ff5500] text-white shadow-[0_0_8px_rgba(255,85,0,0.35)]"
-                              : "bg-white border-neutral-200 text-neutral-400"
-                          }`}
-                        >
-                          <Gift size={13} />
+                        <div className="relative w-full h-full">
+                          <div
+                            className={`size-7 rounded-full border flex items-center justify-center transition-all duration-300 shadow-sm ${
+                              subtotal >= 1699
+                                ? "bg-[#ff5500] border-[#ff5500] text-white shadow-[0_0_8px_rgba(255,85,0,0.35)]"
+                                : "bg-white border-neutral-200 text-neutral-400"
+                            }`}
+                          >
+                            <Gift size={13} />
+                          </div>
+                          <span className="absolute top-8 left-1/2 -translate-x-1/2 text-[10px] font-bold text-muted-foreground font-sans whitespace-nowrap leading-none">
+                            ₹1,699
+                          </span>
                         </div>
-                        <span className="text-[10px] font-bold text-muted-foreground mt-2 font-sans leading-none">
-                          ₹1,699
-                        </span>
                       </div>
 
                       {/* Milestone 2 (₹2,499) */}
                       <div
-                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col items-center z-10"
+                        className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 size-7"
                         style={{ left: `${(2499 / 2800) * 100}%` }}
                       >
-                        <div
-                          className={`size-7 rounded-full border flex items-center justify-center transition-all duration-300 shadow-sm ${
-                            subtotal >= 2499
-                              ? "bg-[#ff5500] border-[#ff5500] text-white shadow-[0_0_8px_rgba(255,85,0,0.35)]"
-                              : "bg-white border-neutral-200 text-neutral-400"
-                          }`}
-                        >
-                          <Gift size={13} />
+                        <div className="relative w-full h-full">
+                          <div
+                            className={`size-7 rounded-full border flex items-center justify-center transition-all duration-300 shadow-sm ${
+                              subtotal >= 2499
+                                ? "bg-[#ff5500] border-[#ff5500] text-white shadow-[0_0_8px_rgba(255,85,0,0.35)]"
+                                : "bg-white border-neutral-200 text-neutral-400"
+                            }`}
+                          >
+                            <Gift size={13} />
+                          </div>
+                          <span className="absolute top-8 left-1/2 -translate-x-1/2 text-[10px] font-bold text-muted-foreground font-sans whitespace-nowrap leading-none">
+                            ₹2,499
+                          </span>
                         </div>
-                        <span className="text-[10px] font-bold text-muted-foreground mt-2 font-sans leading-none">
-                          ₹2,499
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Gifts Info Panel */}
-                  <div className="grid grid-cols-2 gap-3 mt-1 pt-2 border-t border-border/40">
-                    {/* Gift 1 info */}
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`p-1.5 rounded-lg ${
-                          subtotal >= 1699
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        <Gift size={14} />
-                      </div>
-                      <div className="flex flex-col min-w-0">
-                        <span
-                          className={`font-semibold text-[11px] truncate ${
-                            subtotal >= 1699 ? "text-emerald-700" : "text-muted-foreground"
-                          }`}
-                        >
-                          Gift 1 (₹1,699)
-                        </span>
-                        <span className="text-[9px] text-muted-foreground/75 truncate">
-                          Premium Cable Organizer
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Gift 2 info */}
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`p-1.5 rounded-lg ${
-                          subtotal >= 2499
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        <Gift size={14} />
-                      </div>
-                      <div className="flex flex-col min-w-0">
-                        <span
-                          className={`font-semibold text-[11px] truncate ${
-                            subtotal >= 2499 ? "text-emerald-700" : "text-muted-foreground"
-                          }`}
-                        >
-                          Gift 2 (₹2,499)
-                        </span>
-                        <span className="text-[9px] text-muted-foreground/75 truncate">
-                          MagSafe Metal Ring
-                        </span>
                       </div>
                     </div>
                   </div>

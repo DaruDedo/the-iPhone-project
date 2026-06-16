@@ -313,3 +313,11 @@ export const users = pgTable("users", {
 export const usersRelations = relations(users, ({ many }) => ({
   orders: many(orders),
 }));
+
+export const otps = pgTable("otps", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").notNull(),
+  code: text("code").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

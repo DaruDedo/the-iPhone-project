@@ -37,26 +37,8 @@ export default function CheckoutPage() {
   useEffect(() => {
     async function checkUserSession() {
       try {
-        const supabase = await getSupabaseBrowserClientAsync();
-        let token = "";
-        let email = "";
-
-        if (supabase) {
-          const {
-            data: { session },
-          } = await supabase.auth.getSession();
-          if (session?.user?.email) {
-            token = session.access_token;
-            email = session.user.email;
-          }
-        } else {
-          // Dev Mode fallback
-          const localEmail = localStorage.getItem("mock_session_email");
-          if (localEmail) {
-            token = `mock_${localEmail}`;
-            email = localEmail;
-          }
-        }
+        const token = localStorage.getItem("user_session_token");
+        const email = localStorage.getItem("user_session_email");
 
         if (token && email) {
           setIsLoggedIn(true);
