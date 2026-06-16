@@ -209,59 +209,87 @@ export function CartDrawer() {
 
               {/* Promo Coupons Container */}
               <div className="border border-border/60 bg-background rounded-[16px] overflow-hidden text-xs shadow-sm shrink-0">
-                {/* Input Row */}
-                <div className="flex h-12 items-center justify-between px-3.5 border-b border-border/40">
-                  <input
-                    type="text"
-                    placeholder="ENTER CODE"
-                    value={couponInput}
-                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                    className="flex-1 min-w-0 pr-3 font-sans font-bold tracking-wide text-foreground placeholder:text-muted-foreground/45 placeholder:font-bold placeholder:tracking-wide focus:outline-none bg-transparent text-[11px]"
-                  />
-                  <button
-                    onClick={() => {
-                      if (couponInput.trim()) {
-                        setAppliedCoupon(couponInput.trim());
-                        setCouponInput("");
-                      }
-                    }}
-                    className="border border-border/80 rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-medium uppercase text-[#595e6a] hover:bg-secondary/40 hover:text-foreground transition-all focus:outline-none"
-                  >
-                    APPLY
-                  </button>
-                </div>
-
-                {/* Coupons List */}
-                <div className="divide-y divide-border/30 bg-background/50">
-                  {COUPONS.map((coupon) => {
-                    const isApplied = appliedCoupon === coupon.code;
-                    return (
-                      <div
-                        key={coupon.code}
-                        className="flex items-center justify-between px-3.5 py-3"
+                {appliedCoupon && activeCoupon ? (
+                  <div className="p-4 flex flex-col gap-3.5 bg-background/50">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase font-bold tracking-[0.15em] text-muted-foreground/80 font-sans">
+                        Applied Code
+                      </span>
+                      <button
+                        onClick={() => setAppliedCoupon("")}
+                        className="text-[11px] font-medium text-muted-foreground hover:text-[#ff5500] underline focus:outline-none font-sans cursor-pointer"
                       >
-                        <div className="flex flex-col gap-0.5 min-w-0">
-                          <span className="font-display font-bold text-foreground uppercase text-[13px] tracking-wide">
-                            {coupon.code}
-                          </span>
-                          <span className="font-sans text-[11px] text-muted-foreground/80 leading-tight">
-                            {coupon.desc}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => setAppliedCoupon(isApplied ? "" : coupon.code)}
-                          className={`border rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-medium uppercase transition-all focus:outline-none ${
-                            isApplied
-                              ? "bg-white border-[#ff5500] text-[#ff5500] shadow-sm"
-                              : "border-border/80 text-[#595e6a] hover:bg-secondary/40 hover:text-foreground"
-                          }`}
-                        >
-                          {isApplied ? "APPLIED" : "APPLY"}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
+                        Remove
+                      </button>
+                    </div>
+                    <div className="text-[22px] font-extrabold text-foreground tracking-tight font-display uppercase leading-tight mt-0.5">
+                      {appliedCoupon}
+                    </div>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-[#ff5500] font-semibold font-sans text-[12px]">
+                        You save ₹{discountAmount.toLocaleString("en-IN")} INR
+                      </span>
+                      <span className="bg-[#ff5500]/8 border border-[#ff5500]/15 text-[#ff5500] rounded-[4px] px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase font-sans">
+                        Applied
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  /* Input Row & Coupons List */
+                  <>
+                    <div className="flex h-12 items-center justify-between px-3.5 border-b border-border/40">
+                      <input
+                        type="text"
+                        placeholder="ENTER CODE"
+                        value={couponInput}
+                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                        className="flex-1 min-w-0 pr-3 font-sans font-bold tracking-wide text-foreground placeholder:text-muted-foreground/45 placeholder:font-bold placeholder:tracking-wide focus:outline-none bg-transparent text-[11px]"
+                      />
+                      <button
+                        onClick={() => {
+                          if (couponInput.trim()) {
+                            setAppliedCoupon(couponInput.trim());
+                            setCouponInput("");
+                          }
+                        }}
+                        className="border border-border/80 rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-medium uppercase text-[#595e6a] hover:bg-secondary/40 hover:text-foreground transition-all focus:outline-none"
+                      >
+                        APPLY
+                      </button>
+                    </div>
+
+                    <div className="divide-y divide-border/30 bg-background/50">
+                      {COUPONS.map((coupon) => {
+                        const isApplied = appliedCoupon === coupon.code;
+                        return (
+                          <div
+                            key={coupon.code}
+                            className="flex items-center justify-between px-3.5 py-3"
+                          >
+                            <div className="flex flex-col gap-0.5 min-w-0">
+                              <span className="font-display font-bold text-foreground uppercase text-[13px] tracking-wide">
+                                {coupon.code}
+                              </span>
+                              <span className="font-sans text-[11px] text-muted-foreground/80 leading-tight">
+                                {coupon.desc}
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => setAppliedCoupon(isApplied ? "" : coupon.code)}
+                              className={`border rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-medium uppercase transition-all focus:outline-none ${
+                                isApplied
+                                  ? "bg-white border-[#ff5500] text-[#ff5500] shadow-sm"
+                                  : "border-border/80 text-[#595e6a] hover:bg-secondary/40 hover:text-foreground"
+                              }`}
+                            >
+                              {isApplied ? "APPLIED" : "APPLY"}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Add-on Wallet Card */}
