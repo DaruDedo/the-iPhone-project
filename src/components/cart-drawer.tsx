@@ -225,7 +225,7 @@ export function CartDrawer() {
                         setCouponInput("");
                       }
                     }}
-                    className="border border-border/80 rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-bold uppercase text-[#595e6a] hover:bg-secondary/40 hover:text-foreground transition-all focus:outline-none"
+                    className="border border-border/80 rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-medium uppercase text-[#595e6a] hover:bg-secondary/40 hover:text-foreground transition-all focus:outline-none"
                   >
                     APPLY
                   </button>
@@ -241,7 +241,7 @@ export function CartDrawer() {
                         className="flex items-center justify-between px-3.5 py-3"
                       >
                         <div className="flex flex-col gap-0.5 min-w-0">
-                          <span className="font-sans font-bold text-foreground uppercase text-[13px] tracking-wide">
+                          <span className="font-display font-bold text-foreground uppercase text-[13px] tracking-wide">
                             {coupon.code}
                           </span>
                           <span className="font-sans text-[11px] text-muted-foreground/80 leading-tight">
@@ -250,9 +250,9 @@ export function CartDrawer() {
                         </div>
                         <button
                           onClick={() => setAppliedCoupon(isApplied ? "" : coupon.code)}
-                          className={`border rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-bold uppercase transition-all focus:outline-none ${
+                          className={`border rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-medium uppercase transition-all focus:outline-none ${
                             isApplied
-                              ? "bg-[#ff5500] border-[#ff5500] text-white shadow-sm"
+                              ? "bg-white border-[#ff5500] text-[#ff5500] shadow-sm"
                               : "border-border/80 text-[#595e6a] hover:bg-secondary/40 hover:text-foreground"
                           }`}
                         >
@@ -280,7 +280,7 @@ export function CartDrawer() {
                     <span className="text-[8px] font-extrabold text-[#ff5500] uppercase tracking-wider">
                       Add-on / 01
                     </span>
-                    <span className="text-xs font-bold text-foreground truncate">
+                    <span className="font-display text-xs font-bold text-foreground truncate">
                       MagSafe Wallet
                     </span>
                     <span className="text-[10px] text-muted-foreground truncate">
