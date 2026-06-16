@@ -211,8 +211,7 @@ export function CartDrawer() {
               <div className="border border-border/60 bg-background rounded-[16px] overflow-hidden text-xs shadow-sm shrink-0">
                 {appliedCoupon && activeCoupon ? (
                   <div className="flex flex-col">
-                    {/* Applied Coupon Card */}
-                    <div className="p-4 flex flex-col gap-3.5 bg-background/50">
+                    <div className="p-4 flex flex-col gap-3 bg-background/50">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] uppercase font-bold tracking-[0.15em] text-muted-foreground/80 font-sans">
                           Applied Code
@@ -224,16 +223,18 @@ export function CartDrawer() {
                           Remove
                         </button>
                       </div>
-                      <div className="text-[22px] font-extrabold text-foreground tracking-tight font-display uppercase leading-tight mt-0.5">
-                        {appliedCoupon}
-                      </div>
-                      <div className="flex items-center justify-between mt-1">
-                        <span className="text-[#ff5500] font-semibold font-sans text-[12px]">
-                          You save ₹{discountAmount.toLocaleString("en-IN")} INR
-                        </span>
-                        <span className="bg-[#ff5500]/8 border border-[#ff5500]/15 text-[#ff5500] rounded-[4px] px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase font-sans">
-                          Applied
-                        </span>
+                      <div className="flex flex-col gap-1">
+                        <div className="text-[22px] font-extrabold text-foreground tracking-tight font-display uppercase leading-tight">
+                          {appliedCoupon}
+                        </div>
+                        <div className="flex items-center justify-between mt-0.5">
+                          <span className="text-emerald-700 font-semibold font-sans text-[12px]">
+                            You save ₹{discountAmount.toLocaleString("en-IN")} INR
+                          </span>
+                          <span className="bg-emerald-50 border border-emerald-100/50 text-emerald-700 rounded-[4px] px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase font-sans">
+                            Applied
+                          </span>
+                        </div>
                       </div>
                     </div>
 
