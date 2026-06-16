@@ -62,11 +62,18 @@ export async function POST(request: Request) {
     const token = createToken({ email: cleanEmail });
 
     return NextResponse.json({ success: true, token });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error in OTP verify route:", err);
+    let details = err instanceof Error ? err.message : String(err);
+    if (err && typeof err === "object") {
+      if (err.detail) details += " | Detail: " + err.detail;
+      if (err.hint) details += " | Hint: " + err.hint;
+      if (err.code) details += " | Code: " + err.code;
+    }
+    const isProduction = Boolean(process.env.RESEND_API_KEY);
     return NextResponse.json({
       error: "Internal Server Error",
-      details: err instanceof Error ? err.message : String(err),
+      details: isProduction ? undefined : details,
     }, { status: 500 });
   }
 }

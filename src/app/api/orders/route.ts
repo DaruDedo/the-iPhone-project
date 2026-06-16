@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
+import { sendOrderConfirmationEmail } from "@/lib/emails";
 import { getProducts } from "@/lib/catalog";
 
 type CheckoutItemInput = {
@@ -207,9 +208,42 @@ export async function POST(request: Request) {
             .where(eq(schema.productModelInventory.id, item.model.inventoryId));
         }
       }
-
       return createdOrder;
     });
+
+    // Send Order Confirmation Email asynchronously
+    try {
+      const emailItems = items.map((item) => ({
+        productName: item.product.name,
+        modelName: item.product.requiresModelFit
+          ? (item.model?.name ?? "iPhone")
+          : item.product.category,
+        sku: item.model?.sku ?? item.product.slug,
+        unitPrice: item.unitPrice,
+        quantity: item.quantity,
+        lineTotal: item.lineTotal,
+      }));
+
+      sendOrderConfirmationEmail(
+        {
+          orderNumber: order.orderNumber,
+          customerName: customerDetails.name,
+          email: customerDetails.email,
+          phone: customerDetails.phone,
+          address: customerDetails.address,
+          pincode: customerDetails.pincode,
+          paymentMethod,
+          subtotal,
+          shipping,
+          total,
+        },
+        emailItems,
+      ).catch((err) => {
+        console.error("Async Order Confirmation email failed:", err);
+      });
+    } catch (emailErr) {
+      console.error("Error setting up Order Confirmation email:", emailErr);
+    }
 
     return NextResponse.json({
       orderNumber: order.orderNumber,

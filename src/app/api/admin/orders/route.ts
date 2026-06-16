@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
+import { sendOrderStatusUpdateEmail } from "@/lib/emails";
 import { isAdminError, requireAdmin } from "@/lib/admin-auth";
 
 type OrderStatus = "new" | "confirmed" | "packed" | "shipped" | "delivered" | "cancelled";
@@ -83,10 +84,34 @@ export async function PATCH(request: Request) {
   }
 
   try {
+    const order = await db.query.orders.findFirst({
+      where: eq(schema.orders.id, body.orderId),
+    });
+
+    if (!order) {
+      return NextResponse.json({ error: "Order not found." }, { status: 404 });
+    }
+
     await db
       .update(schema.orders)
       .set({ status: body.status, updatedAt: new Date() })
       .where(eq(schema.orders.id, body.orderId));
+
+    // Send Status Update Email asynchronously
+    try {
+      sendOrderStatusUpdateEmail(
+        {
+          orderNumber: order.orderNumber,
+          customerName: order.customerName,
+          email: order.email,
+        },
+        body.status,
+      ).catch((err) => {
+        console.error("Async Order Status Update email failed:", err);
+      });
+    } catch (emailErr) {
+      console.error("Error setting up Order Status Update email:", emailErr);
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {

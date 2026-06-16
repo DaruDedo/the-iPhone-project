@@ -80,9 +80,10 @@ export async function POST(request: Request) {
       if (err.hint) details += " | Hint: " + err.hint;
       if (err.code) details += " | Code: " + err.code;
     }
+    const isProduction = Boolean(process.env.RESEND_API_KEY);
     return NextResponse.json({
       error: "Internal Server Error",
-      details,
+      details: isProduction ? undefined : details,
     }, { status: 500 });
   }
 }
