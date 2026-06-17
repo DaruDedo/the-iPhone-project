@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${resendApiKey}`,
+          Authorization: `Bearer ${resendApiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -72,18 +72,22 @@ export async function POST(request: Request) {
       console.log(`[DEV MODE] OTP generated for ${cleanEmail}: ${code}`);
       return NextResponse.json({ success: true, devMode: true, code });
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error in OTP send route:", err);
     let details = err instanceof Error ? err.message : String(err);
     if (err && typeof err === "object") {
-      if (err.detail) details += " | Detail: " + err.detail;
-      if (err.hint) details += " | Hint: " + err.hint;
-      if (err.code) details += " | Code: " + err.code;
+      const dbError = err as { detail?: unknown; hint?: unknown; code?: unknown };
+      if (dbError.detail) details += " | Detail: " + String(dbError.detail);
+      if (dbError.hint) details += " | Hint: " + String(dbError.hint);
+      if (dbError.code) details += " | Code: " + String(dbError.code);
     }
     const isProduction = Boolean(process.env.RESEND_API_KEY);
-    return NextResponse.json({
-      error: "Internal Server Error",
-      details: isProduction ? undefined : details,
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Internal Server Error",
+        details: isProduction ? undefined : details,
+      },
+      { status: 500 },
+    );
   }
 }

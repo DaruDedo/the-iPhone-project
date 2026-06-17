@@ -5,6 +5,7 @@ import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
 import { sendOrderConfirmationEmail } from "@/lib/emails";
 import { getProducts } from "@/lib/catalog";
+import { isValidIndianPhone, toTenDigitPhone } from "@/lib/phone";
 
 type CheckoutItemInput = {
   variantId?: string;
@@ -51,9 +52,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Delivery details are required." }, { status: 400 });
   }
 
+  const cleanPhone = toTenDigitPhone(customer.phone);
+
+  if (!isValidIndianPhone(customer.phone)) {
+    return NextResponse.json(
+      { error: "Enter a valid 10-digit Indian phone number." },
+      { status: 400 },
+    );
+  }
+
   const customerDetails = {
     name: customer.name,
-    phone: customer.phone,
+    phone: cleanPhone,
     email: customer.email,
     address: customer.address,
     pincode: customer.pincode,

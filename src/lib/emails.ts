@@ -71,7 +71,7 @@ export async function sendOrderConfirmationEmail(
   }[],
 ) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  
+
   const itemsHtml = items
     .map(
       (item) => `

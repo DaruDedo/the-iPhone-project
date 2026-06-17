@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 
 import { CartDrawer } from "@/components/cart-drawer";
 import { CartProvider } from "@/components/cart-provider";
+import { GlobalToastEvents } from "@/components/global-toast-events";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { Toaster } from "@/components/ui/sonner";
+import { WhatsAppFloat } from "@/components/whatsapp-float";
 import { JsonLd, organizationJsonLd, siteConfig, websiteJsonLd } from "@/lib/seo";
 
 import "@/styles.css";
@@ -74,6 +77,9 @@ export default function RootLayout({
           {children}
           <SiteFooter />
           <CartDrawer />
+          <WhatsAppFloat />
+          <GlobalToastEvents />
+          <Toaster />
         </CartProvider>
       </body>
     </html>

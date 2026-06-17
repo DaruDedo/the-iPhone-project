@@ -5,6 +5,7 @@ import {
   getCollectionBySlug as getFallbackCollectionBySlug,
   getIphoneModelBySlug,
   iphoneModels as fallbackIphoneModels,
+  placeholderProductImage,
   products as fallbackProducts,
   productCategories as fallbackProductCategories,
   type Collection,
@@ -65,6 +66,14 @@ function slugify(value: string) {
 
 function bySortOrder<T extends { sortOrder?: number; sort_order?: number | null }>(a: T, b: T) {
   return (a.sortOrder ?? a.sort_order ?? 0) - (b.sortOrder ?? b.sort_order ?? 0);
+}
+
+function canUseStaticProductFallback() {
+  return (
+    process.env.NODE_ENV !== "production" ||
+    process.env.ENABLE_STATIC_PRODUCT_FALLBACK === "true" ||
+    process.env.NEXT_PUBLIC_ENABLE_STATIC_PRODUCT_FALLBACK === "true"
+  );
 }
 
 function getSafeImageUrl(productSlug: string, url: string) {
@@ -209,8 +218,7 @@ function mapProduct(row: DbProduct): Product {
   const category = row.category;
   const images = mapImages(row.slug, row.name, row.images ?? []);
   const fallbackImage =
-    fallbackProducts.find((product) => product.slug === row.slug)?.image ??
-    fallbackProducts[0].image;
+    fallbackProducts.find((product) => product.slug === row.slug)?.image ?? placeholderProductImage;
   const image =
     images.find((item) => item.isPrimary && item.kind === "image") ??
     images.find((item) => item.kind === "image") ??
@@ -449,11 +457,12 @@ export async function getIphoneModels() {
 export async function getProducts(options: { includeInactive?: boolean } = {}) {
   const dbProducts = await fetchDrizzleProducts(options);
   if (!dbProducts) {
-    return fallbackProducts;
+    return canUseStaticProductFallback() ? fallbackProducts : [];
   }
-  const dbSlugs = new Set(dbProducts.map((p) => p.slug));
-  const missingFallbacks = fallbackProducts.filter((p) => !dbSlugs.has(p.slug));
-  return [...dbProducts, ...missingFallbacks];
+  if (dbProducts.length > 0) {
+    return dbProducts;
+  }
+  return canUseStaticProductFallback() ? fallbackProducts : [];
 }
 
 export async function getProductBySlug(slug: string) {

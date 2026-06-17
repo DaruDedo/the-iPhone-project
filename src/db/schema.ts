@@ -1,5 +1,14 @@
 import { relations } from "drizzle-orm";
-import { boolean, integer, pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 export const adminUsers = pgTable("admin_users", {
   email: text("email").primaryKey(),
@@ -319,5 +328,29 @@ export const otps = pgTable("otps", {
   email: text("email").notNull(),
   code: text("code").notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const leads = pgTable("leads", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  type: text("type").notNull(),
+  name: text("name"),
+  phone: text("phone"),
+  email: text("email"),
+  source: text("source").notNull().default("direct"),
+  status: text("status").notNull().default("new"),
+  payload: jsonb("payload").$type<Record<string, unknown>>().notNull().default({}),
+  lastActiveAt: timestamp("last_active_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const analyticsEvents = pgTable("analytics_events", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  eventName: text("event_name").notNull(),
+  source: text("source").notNull().default("direct"),
+  phone: text("phone"),
+  email: text("email"),
+  payload: jsonb("payload").$type<Record<string, unknown>>().notNull().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

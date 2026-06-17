@@ -46,6 +46,7 @@
     "drizzle-orm": "^0.45.2",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
+    "instagram-url-direct": "^2.0.7",
     "lucide-react": "^0.575.0",
     "next": "^16.0.10",
     "postgres": "^3.4.9",

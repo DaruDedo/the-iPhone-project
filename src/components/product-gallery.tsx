@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { ImageIcon, Instagram, Play, Video } from "lucide-react";
+import Link from "next/link";
+import { ExternalLink, ImageIcon, Instagram, Loader2, Play, Video } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import type { Product, ProductImage } from "@/data/products";
@@ -11,25 +12,16 @@ import {
   type ProductMediaKind,
 } from "@/lib/product-media";
 
-const views = [
-  { label: "Main view", scale: "scale-[1.02]", rotate: "rotate-0", position: "object-center" },
-  { label: "Back angle", scale: "scale-[1.36]", rotate: "rotate-10", position: "object-bottom" },
-  { label: "Camera detail", scale: "scale-[1.58]", rotate: "-rotate-6", position: "object-top" },
-  {
-    label: "Side edge",
-    scale: "scale-[1.48]",
-    rotate: "rotate-[34deg]",
-    position: "object-center",
-  },
-];
-
 type GalleryItem = ProductImage & {
   label: string;
   kind: ProductMediaKind;
   embedUrl: string | null;
-  scale: string;
-  rotate: string;
-  position: string;
+};
+
+type ResolvedInstagramMedia = {
+  kind: "image" | "video";
+  url: string;
+  thumbnail: string | null;
 };
 
 function getMediaKind(media: ProductImage) {
@@ -44,33 +36,16 @@ function createGalleryItems(product: Product): GalleryItem[] {
     ),
   ];
 
-  const realItems = media.map<GalleryItem>((item, index) => {
-    const view = views[index % views.length];
+  return media.map<GalleryItem>((item, index) => {
     const kind = getMediaKind(item);
 
     return {
       ...item,
-      label: view.label,
+      label: index === 0 ? "Main view" : `Gallery media ${index + 1}`,
       kind,
       embedUrl: item.embedUrl ?? getInstagramEmbedUrl(item.url),
-      scale: view.scale,
-      rotate: view.rotate,
-      position: view.position,
     };
   });
-
-  if (realItems.length === 1 && realItems[0]?.kind === "image") {
-    return views.map((view, index) => ({
-      ...realItems[0],
-      id: `${realItems[0].id}-${index}`,
-      label: view.label,
-      scale: view.scale,
-      rotate: view.rotate,
-      position: view.position,
-    }));
-  }
-
-  return realItems;
 }
 
 function MediaIcon({ kind }: { kind: ProductMediaKind }) {
@@ -85,25 +60,105 @@ function MediaIcon({ kind }: { kind: ProductMediaKind }) {
   return <ImageIcon className="size-5" />;
 }
 
-function ActiveMedia({ item, product }: { item: GalleryItem; product: Product }) {
-  if (item.kind === "instagram" && item.embedUrl) {
+function InstagramMediaPlayer({ item, product }: { item: GalleryItem; product: Product }) {
+  const [media, setMedia] = useState<ResolvedInstagramMedia | null>(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    setMedia(null);
+    setError("");
+
+    fetch(`/api/media/instagram?url=${encodeURIComponent(item.url)}`)
+      .then(async (response) => {
+        const payload = (await response.json()) as ResolvedInstagramMedia | { error?: string };
+
+        if (!response.ok || !("url" in payload)) {
+          throw new Error("error" in payload ? payload.error : "Could not load Instagram reel.");
+        }
+
+        if (!cancelled) {
+          setMedia(payload);
+        }
+      })
+      .catch((fetchError: unknown) => {
+        if (!cancelled) {
+          setError(
+            fetchError instanceof Error ? fetchError.message : "Could not load Instagram reel.",
+          );
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [item.url]);
+
+  if (media?.kind === "video") {
     return (
-      <iframe
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-        allowFullScreen
-        className="absolute inset-0 h-full w-full border-0 bg-white"
-        loading="lazy"
-        src={item.embedUrl}
-        title={`${product.name} Instagram media`}
+      <video
+        key={media.url}
+        className="absolute inset-0 h-full w-full object-cover"
+        autoPlay
+        loop
+        muted
+        playsInline
+        poster={media.thumbnail ?? product.image.url}
+        src={media.url}
       />
     );
+  }
+
+  if (media?.kind === "image") {
+    return (
+      <img
+        src={media.url}
+        alt={`${product.name} Instagram media`}
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+    );
+  }
+
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(circle_at_50%_25%,rgba(255,85,0,0.24),transparent_34%),linear-gradient(135deg,#111,#050505)] p-8 text-center text-white">
+      <div className="grid size-16 place-items-center rounded-full border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl">
+        {error ? <Instagram className="size-7" /> : <Loader2 className="size-7 animate-spin" />}
+      </div>
+      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.22em] text-white/55">
+        Instagram reel
+      </p>
+      <h3 className="mt-2 max-w-md text-2xl font-bold md:text-4xl">{product.name}</h3>
+      <p className="mt-3 max-w-sm text-sm leading-6 text-white/60">
+        {error || "Loading the reel as a clean product video..."}
+      </p>
+      {error && (
+        <Link
+          href={item.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-white/90"
+        >
+          Open reel
+          <ExternalLink className="size-4" />
+        </Link>
+      )}
+    </div>
+  );
+}
+
+function ActiveMedia({ item, product }: { item: GalleryItem; product: Product }) {
+  if (item.kind === "instagram") {
+    return <InstagramMediaPlayer item={item} product={product} />;
   }
 
   if (item.kind === "video") {
     return (
       <video
         className="absolute inset-0 h-full w-full object-cover"
-        controls
+        autoPlay
+        loop
+        muted
         playsInline
         poster={product.image.url}
         src={item.url}
@@ -118,7 +173,7 @@ function ActiveMedia({ item, product }: { item: GalleryItem; product: Product })
       fill
       priority
       sizes="(min-width: 1024px) 54vw, 100vw"
-      className={`object-cover drop-shadow-2xl transition-transform duration-700 ${item.position} ${item.scale} ${item.rotate}`}
+      className="object-contain"
     />
   );
 }
@@ -163,7 +218,7 @@ export function ProductGallery({ product }: { product: Product }) {
 
   return (
     <div className="grid gap-3 lg:grid-cols-[5rem_minmax(0,1fr)] lg:items-start">
-      <div className="order-2 flex gap-2 overflow-x-auto pb-1 lg:order-1 lg:flex-col lg:overflow-visible lg:pb-0">
+      <div className="order-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:order-1 lg:flex-col lg:overflow-visible lg:pb-0">
         {galleryItems.map((item, index) => (
           <button
             key={`${item.id}-${index}`}
@@ -180,13 +235,7 @@ export function ProductGallery({ product }: { product: Product }) {
             {item.kind === "image" ? (
               <>
                 <div className="absolute inset-0" style={{ background: product.tint }} />
-                <Image
-                  src={item.url}
-                  alt=""
-                  fill
-                  sizes="80px"
-                  className={`object-cover ${item.position} ${item.scale} ${item.rotate}`}
-                />
+                <Image src={item.url} alt="" fill sizes="80px" className="object-contain" />
               </>
             ) : (
               <div className="absolute inset-0 grid place-items-center bg-foreground text-background">

@@ -28,19 +28,22 @@ export async function POST(request: Request) {
     // Find the latest active OTP for this email
     const now = new Date();
     const latestOtp = await db.query.otps.findFirst({
-      where: and(
-        eq(schema.otps.email, cleanEmail),
-        gt(schema.otps.expiresAt, now)
-      ),
+      where: and(eq(schema.otps.email, cleanEmail), gt(schema.otps.expiresAt, now)),
       orderBy: [desc(schema.otps.createdAt)],
     });
 
     if (!latestOtp) {
-      return NextResponse.json({ error: "OTP expired or not found. Please request a new one." }, { status: 400 });
+      return NextResponse.json(
+        { error: "OTP expired or not found. Please request a new one." },
+        { status: 400 },
+      );
     }
 
     if (latestOtp.code !== cleanCode) {
-      return NextResponse.json({ error: "Invalid verification code. Please check and try again." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid verification code. Please check and try again." },
+        { status: 400 },
+      );
     }
 
     // OTP matches! Clean up codes for this email
@@ -62,18 +65,22 @@ export async function POST(request: Request) {
     const token = createToken({ email: cleanEmail });
 
     return NextResponse.json({ success: true, token });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error in OTP verify route:", err);
     let details = err instanceof Error ? err.message : String(err);
     if (err && typeof err === "object") {
-      if (err.detail) details += " | Detail: " + err.detail;
-      if (err.hint) details += " | Hint: " + err.hint;
-      if (err.code) details += " | Code: " + err.code;
+      const dbError = err as { detail?: unknown; hint?: unknown; code?: unknown };
+      if (dbError.detail) details += " | Detail: " + String(dbError.detail);
+      if (dbError.hint) details += " | Hint: " + String(dbError.hint);
+      if (dbError.code) details += " | Code: " + String(dbError.code);
     }
     const isProduction = Boolean(process.env.RESEND_API_KEY);
-    return NextResponse.json({
-      error: "Internal Server Error",
-      details: isProduction ? undefined : details,
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Internal Server Error",
+        details: isProduction ? undefined : details,
+      },
+      { status: 500 },
+    );
   }
 }

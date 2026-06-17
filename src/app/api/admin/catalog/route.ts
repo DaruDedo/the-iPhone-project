@@ -27,8 +27,11 @@ type ProductPatchPayload = {
   categoryId?: string;
   collectionId?: string;
   features?: string[];
+  mediaUrls?: string[];
   stock?: number;
 };
+
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export async function GET(request: Request) {
   const admin = await requireAdmin(request);
@@ -207,6 +210,25 @@ export async function PATCH(request: Request) {
       }
     }
 
+    // Append new media/images to the product gallery
+    if (payload.mediaUrls && Array.isArray(payload.mediaUrls) && payload.mediaUrls.length > 0) {
+      const existingImages = await db.query.productImages.findMany({
+        where: eq(schema.productImages.productId, payload.productId),
+        orderBy: (images, { desc }) => [desc(images.sortOrder)],
+      });
+      const nextSortOrder = (existingImages[0]?.sortOrder ?? 0) + 1;
+
+      await db.insert(schema.productImages).values(
+        payload.mediaUrls.map((url, index) => ({
+          productId: payload.productId!,
+          url,
+          alt: `${payload.name ?? "Product"} media ${nextSortOrder + index}`,
+          sortOrder: nextSortOrder + index,
+          isPrimary: false,
+        })),
+      );
+    }
+
     return NextResponse.json({ ok: true });
   } catch (error) {
     return NextResponse.json(
@@ -236,7 +258,41 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    await db.delete(schema.products).where(eq(schema.products.id, productId));
+    const product = uuidPattern.test(productId)
+      ? await db.query.products.findFirst({
+          where: eq(schema.products.id, productId),
+        })
+      : await db.query.products.findFirst({
+          where: eq(schema.products.slug, productId),
+        });
+
+    if (!product) {
+      return NextResponse.json({ ok: true, notFound: true });
+    }
+
+    await db.transaction(async (tx) => {
+      await tx
+        .update(schema.orderItems)
+        .set({
+          productId: null,
+          variantId: null,
+          iphoneModelId: null,
+        })
+        .where(eq(schema.orderItems.productId, product.id));
+
+      await tx.delete(schema.productReviews).where(eq(schema.productReviews.productId, product.id));
+      await tx.delete(schema.productImages).where(eq(schema.productImages.productId, product.id));
+      await tx
+        .delete(schema.productFeatures)
+        .where(eq(schema.productFeatures.productId, product.id));
+      await tx
+        .delete(schema.productModelInventory)
+        .where(eq(schema.productModelInventory.productId, product.id));
+      await tx
+        .delete(schema.productVariants)
+        .where(eq(schema.productVariants.productId, product.id));
+      await tx.delete(schema.products).where(eq(schema.products.id, product.id));
+    });
 
     return NextResponse.json({ ok: true });
   } catch (error) {

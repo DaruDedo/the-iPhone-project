@@ -3,10 +3,7 @@ import { NextResponse } from "next/server";
 
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
-
-function normalizePhone(value: string) {
-  return value.replace(/\D/g, "").slice(-10);
-}
+import { toTenDigitPhone } from "@/lib/phone";
 
 export async function GET(request: Request) {
   const db = getDb();
@@ -35,7 +32,7 @@ export async function GET(request: Request) {
     },
   });
 
-  if (!order || normalizePhone(order.phone) !== normalizePhone(phone)) {
+  if (!order || toTenDigitPhone(order.phone) !== toTenDigitPhone(phone)) {
     return NextResponse.json({ error: "No matching order found." }, { status: 404 });
   }
 

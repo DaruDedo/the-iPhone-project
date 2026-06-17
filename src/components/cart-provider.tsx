@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 
 import type { Product } from "@/data/products";
 
@@ -81,7 +82,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       isOpen,
       itemCount,
       subtotal,
-      openCart: () => setIsOpen(true),
+      openCart: () => {
+        setIsOpen(true);
+        toast.message(
+          itemCount > 0
+            ? `Bag opened / ${itemCount} item${itemCount === 1 ? "" : "s"}`
+            : "Bag opened",
+        );
+      },
       closeCart: () => setIsOpen(false),
       addItem: ({
         product,
@@ -136,6 +144,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
           );
         });
         setIsOpen(true);
+        toast.success(`${product.name} added`);
+        void fetch("/api/leads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            eventName: "add_to_cart",
+            payload: {
+              productSlug: product.slug,
+              productName: product.name,
+              model: model ?? modelSlug ?? product.selectedModel?.name,
+              quantity,
+            },
+          }),
+        }).catch(() => {});
       },
       updateQuantity: (key, quantity) => {
         setItems((current) =>

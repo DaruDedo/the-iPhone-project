@@ -165,9 +165,7 @@ export function SiteHeader() {
       </div>
 
       <header className="sticky top-0 z-50 w-full pb-3 bg-transparent">
-        <div className="relative mx-auto hidden h-16 w-[calc(100%-2.5rem)] max-w-7xl items-center justify-between rounded-b-[2rem] rounded-t-none border border-white/45 border-t-0 bg-white/70 px-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-18px_42px_rgba(255,255,255,0.25),0_18px_55px_rgba(0,0,0,0.08),0_0_34px_rgba(255,255,255,0.5)] backdrop-blur-2xl transition-all duration-500 before:absolute before:inset-0 before:rounded-b-[2rem] before:bg-[radial-gradient(circle_at_12%_0%,rgba(255,255,255,0.95),transparent_34%),radial-gradient(circle_at_88%_100%,rgba(255,255,255,0.4),transparent_32%)] before:opacity-85 after:absolute after:inset-x-8 after:top-0 after:h-px after:bg-white/95 hover:bg-white/78 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-18px_42px_rgba(255,255,255,0.3),0_22px_70px_rgba(0,0,0,0.12),0_0_42px_rgba(255,255,255,0.6)] md:flex">
-          <div className="pointer-events-none absolute bottom-0 left-8 right-8 z-0 h-px bg-gradient-to-r from-[#ff5500]/20 via-[#ff5500]/65 to-[#ff5500]/20 blur-[0.5px]" />
-
+        <div className="tip-nav-shell relative mx-auto hidden h-16 w-[calc(100%-2.5rem)] max-w-7xl items-center justify-between px-8 backdrop-blur-2xl transition-all duration-500 md:flex">
           <div className="relative z-10 flex shrink-0 items-center justify-center rounded-2xl border border-white/55 bg-white/30 px-5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_8px_22px_rgba(0,0,0,0.08)] backdrop-blur-xl">
             <Link
               href="/"
@@ -320,8 +318,7 @@ export function SiteHeader() {
           )}
         </div>
 
-        <div className="relative mx-auto flex h-14 w-[calc(100%-1.25rem)] items-center justify-between overflow-hidden rounded-b-2xl rounded-t-none border border-white/45 border-t-0 bg-white/72 px-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_38px_rgba(0,0,0,0.08),0_0_24px_rgba(255,255,255,0.4)] backdrop-blur-2xl before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.95),transparent_38%),radial-gradient(circle_at_90%_100%,rgba(255,255,255,0.4),transparent_34%)] before:opacity-85 md:hidden">
-          <div className="pointer-events-none absolute bottom-0 left-4 right-4 z-0 h-px bg-gradient-to-r from-[#ff5500]/20 via-[#ff5500]/60 to-[#ff5500]/20 blur-[0.5px]" />
+        <div className="tip-nav-shell tip-nav-shell-mobile relative mx-auto flex h-14 w-[calc(100%-1.25rem)] items-center justify-between overflow-hidden px-3.5 backdrop-blur-2xl md:hidden">
           <button
             aria-label="Open navigation"
             className="relative z-10 grid size-10 shrink-0 place-items-center rounded-full border border-white/60 bg-white/38 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_8px_18px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-all hover:bg-white/55 focus:outline-none"
@@ -497,14 +494,14 @@ export function SiteHeader() {
                 </div>
               </Link>
 
-              {/* Kavach Studio */}
+              {/* The iPhone Project Studio */}
               <Link
                 href="/blog"
                 onClick={closeMobileMenu}
                 className="relative flex h-20 items-center overflow-hidden rounded-2xl bg-[#FAF0FC] p-4 text-xs font-semibold text-foreground transition-all hover:opacity-90"
               >
                 <div className="flex flex-col justify-center z-10">
-                  <span className="font-extrabold text-foreground">Kavach Studio</span>
+                  <span className="font-extrabold text-foreground">Project Studio</span>
                 </div>
                 <div className="absolute right-4 bottom-3 text-3xl font-extrabold text-[#A855F7]/40 font-display select-none">
                   K

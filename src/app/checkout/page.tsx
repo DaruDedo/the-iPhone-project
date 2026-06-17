@@ -94,6 +94,29 @@ Please confirm my order!`;
     setError("");
 
     const form = new FormData(event.currentTarget);
+    void fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "checkout_draft",
+        eventName: "checkout_started",
+        name: form.get("name"),
+        phone: form.get("phone"),
+        email: form.get("email"),
+        payload: {
+          subtotal,
+          itemCount: items.reduce((total, item) => total + item.quantity, 0),
+          items: items.map((item) => ({
+            slug: item.slug,
+            name: item.name,
+            model: item.model,
+            sku: item.sku,
+            quantity: item.quantity,
+          })),
+        },
+      }),
+    }).catch(() => {});
+
     const response = await fetch("/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

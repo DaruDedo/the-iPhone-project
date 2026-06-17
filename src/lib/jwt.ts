@@ -1,6 +1,7 @@
 import crypto from "crypto";
 
-const JWT_SECRET = process.env.JWT_SECRET || "kavach-commerce-default-jwt-secret-key-32-chars-long";
+const JWT_SECRET =
+  process.env.JWT_SECRET || "the-iphone-project-default-jwt-secret-key-32-chars-long";
 
 export interface TokenPayload {
   email: string;
@@ -13,7 +14,9 @@ export interface TokenPayload {
 export function createToken(payload: { email: string }): string {
   const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
   const exp = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60; // 30 days
-  const claims = Buffer.from(JSON.stringify({ email: payload.email.toLowerCase(), exp })).toString("base64url");
+  const claims = Buffer.from(JSON.stringify({ email: payload.email.toLowerCase(), exp })).toString(
+    "base64url",
+  );
 
   const signature = crypto
     .createHmac("sha256", JWT_SECRET)
@@ -45,7 +48,9 @@ export function verifyToken(token: string): { email: string } | null {
     }
 
     // Parse and check claims
-    const decodedClaims = JSON.parse(Buffer.from(claims, "base64url").toString("utf8")) as TokenPayload;
+    const decodedClaims = JSON.parse(
+      Buffer.from(claims, "base64url").toString("utf8"),
+    ) as TokenPayload;
 
     if (decodedClaims.exp && decodedClaims.exp < Date.now() / 1000) {
       console.warn("JWT Verification: Token expired");

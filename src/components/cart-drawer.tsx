@@ -18,20 +18,20 @@ import {
 
 import { getCartItemKey, useCart } from "@/components/cart-provider";
 import { formatPrice, products } from "@/data/products";
-
-const COUPONS = [
-  { code: "TIP100", discount: 100, desc: "Rs 100 off above Rs 999" },
-  { code: "TIP300", discount: 300, desc: "Rs 300 off above Rs 1999" },
-];
+import { coupons, evaluateCoupon, getBestCoupon } from "@/lib/coupons";
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, subtotal, updateQuantity, removeItem, addItem } = useCart();
   const [showTotalsDetails, setShowTotalsDetails] = useState(false);
-  const [appliedCoupon, setAppliedCoupon] = useState<string>("TIP300");
+  const [appliedCoupon, setAppliedCoupon] = useState<string>("");
   const [couponInput, setCouponInput] = useState<string>("");
 
-  const activeCoupon = COUPONS.find((c) => c.code === appliedCoupon);
-  const discountAmount = activeCoupon ? activeCoupon.discount : 0;
+  const activeCoupon = appliedCoupon ? evaluateCoupon(appliedCoupon, items, subtotal) : null;
+  const bestCoupon = getBestCoupon(items, subtotal);
+  const discountAmount = activeCoupon?.eligible ? activeCoupon.discount : 0;
+  const giftOneThreshold = 1699;
+  const giftTwoThreshold = 2499;
+  const giftProgressCap = 2800;
 
   // Find the wallet product for the add-on card
   const walletProduct = products.find((p) => p.slug === "snap-magsafe-wallet");
@@ -39,6 +39,28 @@ export function CartDrawer() {
 
   // Determine item count
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
+
+  function applyCoupon(code: string) {
+    const evaluation = evaluateCoupon(code, items, subtotal);
+
+    setAppliedCoupon(code);
+    void fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "coupon_lead",
+        eventName: "coupon_applied",
+        payload: {
+          code,
+          eligible: evaluation.eligible,
+          discount: evaluation.discount,
+          progressMessage: evaluation.progressMessage,
+          subtotal,
+          itemCount,
+        },
+      }),
+    }).catch(() => {});
+  }
 
   return (
     <>
@@ -84,46 +106,57 @@ export function CartDrawer() {
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto no-scrollbar px-3.5 py-4 space-y-4">
           {items.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center text-center">
+            <div className="flex h-full flex-col justify-center text-center">
               <div className="grid size-14 place-items-center rounded-full bg-muted">
                 <ShoppingBag size={22} />
               </div>
-              <h2 className="mt-5 text-2xl font-bold">Your bag is empty.</h2>
-              <p className="mt-2 max-w-xs text-sm leading-6 text-muted-foreground">
+              <h2 className="mt-5 text-left text-2xl font-bold">Your bag is empty.</h2>
+              <p className="mt-2 max-w-xs text-left text-sm leading-6 text-muted-foreground">
                 Add a cover and it will wait here while you keep browsing.
               </p>
-              <button
+              <div className="mt-5 rounded-[16px] border border-border/60 bg-background p-4 text-left">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  Active offers
+                </p>
+                <div className="mt-3 space-y-2 text-xs text-muted-foreground">
+                  <p>CASEGLASS: case + tempered glass combo discount.</p>
+                  <p>BUY2SAVE: add any two products and save.</p>
+                  <p>FREESHIP: free shipping above Rs. 999.</p>
+                </div>
+              </div>
+              <Link
+                href="/#shop"
                 className="mt-6 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background"
                 onClick={closeCart}
               >
                 Continue shopping
-              </button>
+              </Link>
             </div>
           ) : (
             <>
               {/* Free Gift Milestones Progress Bar */}
-              {subtotal >= 1000 && (
+              {items.length > 0 && (
                 <div className="border border-border/60 bg-background rounded-[16px] p-4 text-xs shadow-sm flex flex-col gap-3.5 shrink-0">
                   <div className="font-sans text-[12px] text-foreground font-medium">
-                    {subtotal < 1699 ? (
+                    {subtotal < giftOneThreshold ? (
                       <span>
                         Add{" "}
                         <strong className="text-[#ff5500]">
-                          ₹{(1699 - subtotal).toLocaleString("en-IN")}
+                          {formatPrice(giftOneThreshold - subtotal)}
                         </strong>{" "}
-                        more to unlock <strong className="text-[#ff5500]">Gift 1</strong>!
+                        more to unlock <strong className="text-[#ff5500]">Gift 1</strong>.
                       </span>
-                    ) : subtotal < 2499 ? (
+                    ) : subtotal < giftTwoThreshold ? (
                       <span className="text-emerald-700">
-                        🎉 <strong className="font-semibold">Gift 1 Unlocked!</strong> Add{" "}
+                        <strong className="font-semibold">Gift 1 unlocked.</strong> Add{" "}
                         <strong className="text-[#ff5500]">
-                          ₹{(2499 - subtotal).toLocaleString("en-IN")}
+                          {formatPrice(giftTwoThreshold - subtotal)}
                         </strong>{" "}
-                        more for <strong className="text-[#ff5500]">Gift 2</strong>!
+                        more for <strong className="text-[#ff5500]">Gift 2</strong>.
                       </span>
                     ) : (
                       <span className="text-emerald-700 font-bold">
-                        🎉 Double Gift Bonanza! Gift 1 & Gift 2 are yours free!
+                        Gift 1 and Gift 2 are unlocked.
                       </span>
                     )}
                   </div>
@@ -135,19 +168,19 @@ export function CartDrawer() {
                       <div
                         className="h-full rounded-full bg-[#ff5500] transition-all duration-300"
                         style={{
-                          width: `${Math.min(100, (subtotal / 2800) * 100)}%`,
+                          width: `${Math.min(100, (subtotal / giftProgressCap) * 100)}%`,
                         }}
                       />
 
                       {/* Milestone 1 (₹1,699) */}
                       <div
                         className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 size-7"
-                        style={{ left: `${(1699 / 2800) * 100}%` }}
+                        style={{ left: `${(giftOneThreshold / giftProgressCap) * 100}%` }}
                       >
                         <div className="relative w-full h-full">
                           <div
                             className={`size-7 rounded-full border flex items-center justify-center transition-all duration-300 shadow-sm ${
-                              subtotal >= 1699
+                              subtotal >= giftOneThreshold
                                 ? "bg-[#ff5500] border-[#ff5500] text-white shadow-[0_0_8px_rgba(255,85,0,0.35)]"
                                 : "bg-white border-neutral-200 text-neutral-400"
                             }`}
@@ -155,7 +188,7 @@ export function CartDrawer() {
                             <Gift size={13} />
                           </div>
                           <span className="absolute top-8 left-1/2 -translate-x-1/2 text-[10px] font-bold text-muted-foreground font-sans whitespace-nowrap leading-none">
-                            ₹1,699
+                            {formatPrice(giftOneThreshold)}
                           </span>
                         </div>
                       </div>
@@ -163,12 +196,12 @@ export function CartDrawer() {
                       {/* Milestone 2 (₹2,499) */}
                       <div
                         className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 size-7"
-                        style={{ left: `${(2499 / 2800) * 100}%` }}
+                        style={{ left: `${(giftTwoThreshold / giftProgressCap) * 100}%` }}
                       >
                         <div className="relative w-full h-full">
                           <div
                             className={`size-7 rounded-full border flex items-center justify-center transition-all duration-300 shadow-sm ${
-                              subtotal >= 2499
+                              subtotal >= giftTwoThreshold
                                 ? "bg-[#ff5500] border-[#ff5500] text-white shadow-[0_0_8px_rgba(255,85,0,0.35)]"
                                 : "bg-white border-neutral-200 text-neutral-400"
                             }`}
@@ -176,7 +209,7 @@ export function CartDrawer() {
                             <Gift size={13} />
                           </div>
                           <span className="absolute top-8 left-1/2 -translate-x-1/2 text-[10px] font-bold text-muted-foreground font-sans whitespace-nowrap leading-none">
-                            ₹2,499
+                            {formatPrice(giftTwoThreshold)}
                           </span>
                         </div>
                       </div>
@@ -309,43 +342,63 @@ export function CartDrawer() {
                         <div className="text-[22px] font-extrabold text-foreground tracking-tight font-display uppercase leading-tight">
                           {appliedCoupon}
                         </div>
+                        <p className="text-[11px] leading-5 text-muted-foreground">
+                          {activeCoupon.progressMessage}
+                        </p>
                         <div className="flex items-center justify-between mt-0.5">
-                          <span className="text-emerald-700 font-semibold font-sans text-[12px]">
-                            You save ₹{discountAmount.toLocaleString("en-IN")} INR
+                          <span
+                            className={`font-semibold font-sans text-[12px] ${
+                              activeCoupon.eligible ? "text-emerald-700" : "text-[#ff5500]"
+                            }`}
+                          >
+                            {activeCoupon.eligible
+                              ? activeCoupon.successMessage ||
+                                `You save Rs. ${discountAmount.toLocaleString("en-IN")}`
+                              : activeCoupon.invalidReason}
                           </span>
-                          <span className="bg-emerald-50 border border-emerald-100/50 text-emerald-700 rounded-[4px] px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase font-sans">
-                            Applied
+                          <span
+                            className={`rounded-[4px] border px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider font-sans ${
+                              activeCoupon.eligible
+                                ? "border-emerald-100/50 bg-emerald-50 text-emerald-700"
+                                : "border-orange-100 bg-orange-50 text-[#ff5500]"
+                            }`}
+                          >
+                            {activeCoupon.eligible ? "Applied" : "Locked"}
                           </span>
                         </div>
                       </div>
                     </div>
 
                     {/* Other Coupons List */}
-                    {COUPONS.filter((coupon) => coupon.code !== appliedCoupon).length > 0 && (
+                    {coupons.filter((coupon) => coupon.code !== appliedCoupon).length > 0 && (
                       <div className="border-t border-border/40 divide-y divide-border/30 bg-background/50">
-                        {COUPONS.filter((coupon) => coupon.code !== appliedCoupon).map((coupon) => {
-                          return (
-                            <div
-                              key={coupon.code}
-                              className="flex items-center justify-between px-3.5 py-3"
-                            >
-                              <div className="flex flex-col gap-0.5 min-w-0">
-                                <span className="font-display font-bold text-foreground uppercase text-[13px] tracking-wide">
-                                  {coupon.code}
-                                </span>
-                                <span className="font-sans text-[11px] text-muted-foreground/80 leading-tight">
-                                  {coupon.desc}
-                                </span>
-                              </div>
-                              <button
-                                onClick={() => setAppliedCoupon(coupon.code)}
-                                className="border border-border/80 rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-medium uppercase transition-all focus:outline-none text-[#595e6a] hover:bg-secondary/40 hover:text-foreground cursor-pointer"
+                        {coupons
+                          .filter((coupon) => coupon.code !== appliedCoupon)
+                          .map((coupon) => {
+                            const evaluation = evaluateCoupon(coupon.code, items, subtotal);
+
+                            return (
+                              <div
+                                key={coupon.code}
+                                className="flex items-center justify-between px-3.5 py-3"
                               >
-                                APPLY
-                              </button>
-                            </div>
-                          );
-                        })}
+                                <div className="flex flex-col gap-0.5 min-w-0">
+                                  <span className="font-display font-bold text-foreground uppercase text-[13px] tracking-wide">
+                                    {coupon.code}
+                                  </span>
+                                  <span className="font-sans text-[11px] text-muted-foreground/80 leading-tight">
+                                    {evaluation.progressMessage}
+                                  </span>
+                                </div>
+                                <button
+                                  onClick={() => applyCoupon(coupon.code)}
+                                  className="border border-border/80 rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-medium uppercase transition-all focus:outline-none text-[#595e6a] hover:bg-secondary/40 hover:text-foreground cursor-pointer"
+                                >
+                                  APPLY
+                                </button>
+                              </div>
+                            );
+                          })}
                       </div>
                     )}
                   </div>
@@ -363,7 +416,7 @@ export function CartDrawer() {
                       <button
                         onClick={() => {
                           if (couponInput.trim()) {
-                            setAppliedCoupon(couponInput.trim());
+                            applyCoupon(couponInput.trim());
                             setCouponInput("");
                           }
                         }}
@@ -374,8 +427,19 @@ export function CartDrawer() {
                     </div>
 
                     <div className="divide-y divide-border/30 bg-background/50">
-                      {COUPONS.map((coupon) => {
+                      <div className="px-3.5 py-3 text-[11px] leading-5 text-muted-foreground">
+                        Best right now:{" "}
+                        <button
+                          className="font-bold text-foreground underline underline-offset-4"
+                          onClick={() => applyCoupon(bestCoupon.code)}
+                        >
+                          {bestCoupon.code}
+                        </button>
+                        . {bestCoupon.progressMessage}
+                      </div>
+                      {coupons.map((coupon) => {
                         const isApplied = appliedCoupon === coupon.code;
+                        const evaluation = evaluateCoupon(coupon.code, items, subtotal);
                         return (
                           <div
                             key={coupon.code}
@@ -386,11 +450,13 @@ export function CartDrawer() {
                                 {coupon.code}
                               </span>
                               <span className="font-sans text-[11px] text-muted-foreground/80 leading-tight">
-                                {coupon.desc}
+                                {evaluation.progressMessage}
                               </span>
                             </div>
                             <button
-                              onClick={() => setAppliedCoupon(isApplied ? "" : coupon.code)}
+                              onClick={() =>
+                                isApplied ? setAppliedCoupon("") : applyCoupon(coupon.code)
+                              }
                               className={`border rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-medium uppercase transition-all focus:outline-none ${
                                 isApplied
                                   ? "bg-white border-[#ff5500] text-[#ff5500] shadow-sm"

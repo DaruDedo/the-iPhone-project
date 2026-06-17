@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Minus, Plus, ShoppingBag, ShieldCheck, Truck } from "lucide-react";
+import { Check, MessageCircle, Minus, Plus, ShoppingBag, ShieldCheck, Truck } from "lucide-react";
 
 import { useCart } from "@/components/cart-provider";
 import { IphoneModelSelector } from "@/components/iphone-model-selector";
 import { formatPrice, type Product } from "@/data/products";
+import { siteConfig } from "@/lib/site";
 
 export function ProductPurchasePanel({ product }: { product: Product }) {
   const availableModels = product.modelOptions.filter((model) => model.isAvailable);
@@ -20,6 +21,9 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
   const activeMrp = selectedModel?.mrp ?? product.mrp;
   const off =
     activeMrp > activePrice ? Math.round(((activeMrp - activePrice) / activeMrp) * 100) : 0;
+  const whatsappMessage = encodeURIComponent(
+    `Hi The iPhone Project, I need help with ${product.name}${selectedModel?.name ? ` for ${selectedModel.name}` : ""}. Price: ${formatPrice(activePrice)}.`,
+  );
 
   return (
     <div className="rounded-3xl border border-border bg-card/85 p-5 shadow-[0_22px_65px_rgba(0,0,0,0.06)] backdrop-blur lg:sticky lg:top-24 lg:p-6">
@@ -102,6 +106,15 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
           Add to bag
         </button>
       </div>
+      <a
+        href={`https://wa.me/${siteConfig.whatsappPhone}?text=${whatsappMessage}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-border bg-background/80 px-4 text-sm font-medium transition hover:border-foreground/35"
+      >
+        <MessageCircle size={17} />
+        Ask on WhatsApp
+      </a>
 
       <div className="mt-7 grid gap-2.5 text-sm">
         {[

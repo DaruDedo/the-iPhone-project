@@ -1,7 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { BarChart3, Boxes, MessageSquareText, PackageCheck, Settings } from "lucide-react";
+import {
+  BarChart3,
+  Boxes,
+  Download,
+  MessageSquareText,
+  PackageCheck,
+  Settings,
+  Users,
+} from "lucide-react";
 
 const adminCards = [
   {
@@ -21,6 +29,24 @@ const adminCards = [
     desc: "Collect, approve, and manage product reviews for better trust and AI visibility.",
     href: "/admin/reviews",
     icon: MessageSquareText,
+  },
+  {
+    title: "Leads",
+    desc: "View cart leads, coupon leads, checkout drafts, and source tracking events.",
+    href: "/admin/leads",
+    icon: Users,
+  },
+  {
+    title: "Templates",
+    desc: "Copy WhatsApp and support messages for orders, payment, tracking, and fit questions.",
+    href: "/admin/templates",
+    icon: MessageSquareText,
+  },
+  {
+    title: "Data export",
+    desc: "Open product feeds, sitemap, AI catalog, order panels, and lead data.",
+    href: "/admin/export",
+    icon: Download,
   },
   {
     title: "Analytics",
