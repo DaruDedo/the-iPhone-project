@@ -449,7 +449,7 @@ export default function AccountPage() {
                       covers!
                     </p>
                     <Link
-                      href="/#shop"
+                      href="/shop"
                       className="mt-6 inline-flex h-10 items-center justify-center rounded-full bg-[linear-gradient(180deg,#ff9d54_0%,#ff5500_100%)] border border-[#e04b00] px-6 text-xs font-display font-extrabold uppercase text-[#000000] hover:opacity-95 transition-all shadow-[0_4px_12px_rgba(255,85,0,0.25)]"
                     >
                       Shop Covers

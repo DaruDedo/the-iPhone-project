@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { toast } from "sonner";
 
 import type { Product } from "@/data/products";
+import { trackMarketingEvent } from "@/components/marketing-pixels";
 
 export type CartItem = {
   productId?: string;
@@ -145,6 +146,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
         });
         setIsOpen(true);
         toast.success(`${product.name} added`);
+        trackMarketingEvent("AddToCart", {
+          content_ids: [product.slug],
+          content_name: product.name,
+          content_type: "product",
+          value: product.price * quantity,
+          currency: "INR",
+        });
         void fetch("/api/leads", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

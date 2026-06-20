@@ -58,8 +58,8 @@ export function IphoneModelSelector({
   }
 
   return (
-    <div ref={rootRef} className={`relative w-full ${className}`}>
-      <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+    <div ref={rootRef} className={`relative w-full min-w-0 ${className}`}>
+      <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground sm:tracking-[0.24em]">
         {label}
       </p>
       <button
@@ -99,7 +99,7 @@ export function IphoneModelSelector({
                 className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm transition hover:bg-foreground/5"
                 onClick={() => chooseModel(model.slug)}
               >
-                <span>{model.name}</span>
+                <span className="min-w-0 truncate">{model.name}</span>
                 {value === model.slug && <Check className="size-4" />}
               </button>
             ))}

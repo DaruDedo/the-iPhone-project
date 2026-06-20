@@ -21,16 +21,20 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
   const activeMrp = selectedModel?.mrp ?? product.mrp;
   const off =
     activeMrp > activePrice ? Math.round(((activeMrp - activePrice) / activeMrp) * 100) : 0;
-  const whatsappMessage = encodeURIComponent(
-    `Hi The iPhone Project, I need help with ${product.name}${selectedModel?.name ? ` for ${selectedModel.name}` : ""}. Price: ${formatPrice(activePrice)}.`,
-  );
+  const whatsappMessage = siteConfig.whatsappPhone
+    ? encodeURIComponent(
+        `Hi The iPhone Project, I need help with ${product.name}${selectedModel?.name ? ` for ${selectedModel.name}` : ""}. Price: ${formatPrice(activePrice)}.`,
+      )
+    : "";
 
   return (
-    <div className="rounded-3xl border border-border bg-card/85 p-5 shadow-[0_22px_65px_rgba(0,0,0,0.06)] backdrop-blur lg:sticky lg:top-24 lg:p-6">
-      <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
+    <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-card/85 p-5 shadow-[0_22px_65px_rgba(0,0,0,0.06)] backdrop-blur lg:sticky lg:top-24 lg:p-6">
+      <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground sm:tracking-[0.24em]">
         {product.category}
       </p>
-      <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">{product.name}</h1>
+      <h1 className="mt-3 overflow-wrap-anywhere text-3xl font-bold tracking-tight min-[360px]:text-4xl md:text-5xl">
+        {product.name}
+      </h1>
       <p className="mt-4 max-w-xl text-sm leading-6 text-muted-foreground md:text-base md:leading-7">
         {product.description}
       </p>
@@ -85,7 +89,7 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
           </button>
         </div>
         <button
-          className="inline-flex h-11 min-w-0 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-foreground px-4 text-sm font-medium text-background transition hover:opacity-90"
+          className="inline-flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-foreground px-4 text-sm font-medium text-background transition hover:opacity-90"
           disabled={product.requiresModelFit && !selectedModel}
           onClick={() =>
             addItem({
@@ -103,18 +107,20 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
           type="button"
         >
           <ShoppingBag size={17} />
-          Add to bag
+          <span className="min-w-0 truncate">Add to bag</span>
         </button>
       </div>
-      <a
-        href={`https://wa.me/${siteConfig.whatsappPhone}?text=${whatsappMessage}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-border bg-background/80 px-4 text-sm font-medium transition hover:border-foreground/35"
-      >
-        <MessageCircle size={17} />
-        Ask on WhatsApp
-      </a>
+      {siteConfig.whatsappPhone && (
+        <a
+          href={`https://wa.me/${siteConfig.whatsappPhone}?text=${whatsappMessage}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-border bg-background/80 px-4 text-sm font-medium transition hover:border-foreground/35"
+        >
+          <MessageCircle size={17} />
+          Ask on WhatsApp
+        </a>
+      )}
 
       <div className="mt-7 grid gap-2.5 text-sm">
         {[
@@ -122,9 +128,9 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
           { icon: ShieldCheck, text: "7-day returns and 6-month warranty" },
           { icon: Check, text: "COD available on supported pin codes" },
         ].map(({ icon: Icon, text }) => (
-          <div key={text} className="flex items-center gap-3 rounded-2xl bg-muted/50 p-3.5">
-            <Icon size={18} />
-            <span>{text}</span>
+          <div key={text} className="flex min-w-0 items-center gap-3 rounded-2xl bg-muted/50 p-3.5">
+            <Icon size={18} className="shrink-0" />
+            <span className="min-w-0">{text}</span>
           </div>
         ))}
       </div>

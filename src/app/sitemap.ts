@@ -29,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     ...[
       "/search",
+      "/shop",
       "/combos",
       "/offers",
       "/track-order",
@@ -38,6 +39,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       "/returns",
       "/warranty",
       "/contact",
+      "/privacy",
+      "/terms",
     ].map((path) => ({
       url: absoluteUrl(path),
       lastModified: now,

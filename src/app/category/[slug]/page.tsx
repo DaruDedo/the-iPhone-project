@@ -101,7 +101,7 @@ export default async function CategoryPage({
   const pageJsonLd = [
     breadcrumbJsonLd([
       { name: "Home", url: "/" },
-      { name: "Categories", url: "/#shop" },
+      { name: "Categories", url: "/shop" },
       { name: category.title, url: `/category/${category.slug}` },
     ]),
     {
@@ -127,7 +127,7 @@ export default async function CategoryPage({
       <JsonLd data={pageJsonLd} />
       <section className="mx-auto max-w-7xl px-3 pb-8 pt-8 sm:px-6 md:pb-10 md:pt-14">
         <Link
-          href="/#shop"
+          href="/shop"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
         >
           <ArrowLeft className="size-4" />

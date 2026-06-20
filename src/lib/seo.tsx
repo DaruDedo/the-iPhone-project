@@ -31,13 +31,17 @@ export function organizationJsonLd() {
     name: siteConfig.name,
     url: siteConfig.url,
     logo: absoluteUrl("/icon.png"),
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: siteConfig.phone,
-      contactType: "customer support",
-      areaServed: "IN",
-      availableLanguage: ["en", "hi"],
-    },
+    ...(siteConfig.phone
+      ? {
+          contactPoint: {
+            "@type": "ContactPoint",
+            telephone: siteConfig.phone,
+            contactType: "customer support",
+            areaServed: "IN",
+            availableLanguage: ["en", "hi"],
+          },
+        }
+      : {}),
     sameAs: ["https://www.instagram.com/theiphoneproject"],
   };
 }

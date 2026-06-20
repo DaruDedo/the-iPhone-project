@@ -26,15 +26,15 @@ import caseOrange from "@/assets/case-orange.jpg";
 import casePink from "@/assets/case-pink.jpg";
 
 const primaryMenuLinks = [
-  { href: "/#shop", label: "Shop" },
-  { href: "/#collections", label: "Collections" },
-  { href: "/#models", label: "Compatibility" },
-  { href: "/blog", label: "Journal" },
-  { href: "/#support", label: "Support" },
+  { href: "/shop", label: "Shop" },
+  { href: "/category/covers-cases", label: "Covers & Cases" },
+  { href: "/category/tempered-glass", label: "Tempered Glass" },
+  { href: "/combos", label: "Combos" },
+  { href: "/offers", label: "Offers" },
 ];
 
 const categoryLinks = [
-  { href: "/#shop", label: "All products" },
+  { href: "/shop", label: "All products" },
   { href: "/category/covers-cases", label: "Covers & Cases" },
   { href: "/category/tempered-glass", label: "Tempered Glass" },
   { href: "/category/camera-protection", label: "Camera Protection" },
@@ -51,7 +51,7 @@ const shopMenuGroups = [
       { href: "/category/camera-protection", label: "Camera Protection" },
       { href: "/category/magsafe-wallets", label: "MagSafe Wallets" },
       { href: "/category/accessories", label: "Accessories" },
-      { href: "/#shop", label: "All Products" },
+      { href: "/shop", label: "All Products" },
     ],
   },
   {
@@ -164,7 +164,7 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <header className="sticky top-0 z-50 w-full pb-3 bg-transparent">
+      <header className="sticky top-0 z-50 w-full bg-transparent pb-3">
         <div className="tip-nav-shell relative mx-auto hidden h-16 w-[calc(100%-2.5rem)] max-w-7xl items-center justify-between px-8 backdrop-blur-2xl transition-all duration-500 md:flex">
           <div className="relative z-10 flex shrink-0 items-center justify-center rounded-2xl border border-white/55 bg-white/30 px-5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_8px_22px_rgba(0,0,0,0.08)] backdrop-blur-xl">
             <Link
@@ -223,7 +223,7 @@ export function SiteHeader() {
                       </div>
                     ))}
                     <Link
-                      href="/#shop"
+                      href="/shop"
                       onClick={() => setShopOpen(false)}
                       className="col-span-3 flex items-center justify-between rounded-2xl bg-[#ff5500] px-4 py-3 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_12px_28px_rgba(255,85,0,0.28)] transition hover:bg-[#ff6a1f]"
                     >
@@ -318,7 +318,7 @@ export function SiteHeader() {
           )}
         </div>
 
-        <div className="tip-nav-shell tip-nav-shell-mobile relative mx-auto flex h-14 w-[calc(100%-1.25rem)] items-center justify-between overflow-hidden px-3.5 backdrop-blur-2xl md:hidden">
+        <div className="tip-nav-shell tip-nav-shell-mobile relative mx-auto flex h-14 w-[calc(100%-1.25rem)] max-w-[calc(100dvw-1.25rem)] items-center justify-between overflow-hidden px-3 backdrop-blur-2xl md:hidden">
           <button
             aria-label="Open navigation"
             className="relative z-10 grid size-10 shrink-0 place-items-center rounded-full border border-white/60 bg-white/38 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_8px_18px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-all hover:bg-white/55 focus:outline-none"
@@ -328,14 +328,14 @@ export function SiteHeader() {
           </button>
           <Link
             href="/"
-            className="relative z-10 select-none whitespace-nowrap text-[13px] font-bold tracking-tight"
+            className="relative z-10 min-w-0 max-w-[48%] shrink select-none truncate rounded-full bg-white/72 px-4 py-2 text-center text-[12px] font-bold tracking-tight shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_6px_16px_rgba(0,0,0,0.08)] min-[360px]:text-[13px]"
             style={{ fontFamily: "'JetBrains Mono', monospace" }}
           >
             <BrandMark />
           </Link>
           <button
             onClick={openCart}
-            className="relative z-10 flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-[#ff5500] bg-white px-3.5 text-[12px] font-semibold text-[#ff5500] shadow-sm transition-all hover:bg-[#ff5500]/5 focus:outline-none font-sans"
+            className="relative z-10 flex h-10 shrink-0 items-center gap-1 rounded-full border border-[#ff5500] bg-white px-2.5 text-[12px] font-semibold text-[#ff5500] shadow-sm transition-all hover:bg-[#ff5500]/5 focus:outline-none font-sans min-[360px]:gap-1.5 min-[360px]:px-3.5"
           >
             <ShoppingBag size={12} className="shrink-0 text-[#ff5500]" />
             <span className="max-[370px]:hidden leading-none">Bag</span>
@@ -347,16 +347,16 @@ export function SiteHeader() {
       </header>
 
       <div
-        className={`fixed inset-0 z-[100] flex flex-col justify-between bg-white transition-all duration-300 md:hidden ${
+        className={`fixed inset-0 z-[100] flex w-dvw max-w-full flex-col justify-between overflow-x-hidden bg-white transition-all duration-300 md:hidden ${
           mobileOpen
             ? "translate-y-0 opacity-100"
             : "-translate-y-full opacity-0 pointer-events-none"
         }`}
       >
         {/* Top Header Bar */}
-        <div className="flex h-14 items-center justify-between border-b border-border/40 px-6 shrink-0">
+        <div className="flex h-14 items-center justify-between gap-3 border-b border-border/40 px-4 shrink-0">
           <span
-            className="text-[15px] font-bold tracking-tight text-foreground"
+            className="min-w-0 truncate text-[13px] font-bold tracking-tight text-foreground min-[360px]:text-[15px]"
             style={{ fontFamily: "'JetBrains Mono', monospace" }}
           >
             THE<span className="text-[#ff5500]">.I</span>PHONE
@@ -386,7 +386,7 @@ export function SiteHeader() {
 
         {/* Search Bar */}
         {showSearch && (
-          <div className="px-6 py-3 shrink-0 border-b border-border/20">
+          <div className="px-4 py-3 shrink-0 border-b border-border/20">
             <div className="relative flex items-center">
               <span className="absolute left-3.5 text-muted-foreground">
                 <Search size={16} />
@@ -409,7 +409,7 @@ export function SiteHeader() {
         )}
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+        <div className="flex-1 overflow-x-hidden overflow-y-auto px-4 py-4 space-y-6">
           {/* Primary Navigation Links */}
           <div className="space-y-0.5">
             {primaryMenuLinks.map((link) => (
@@ -529,7 +529,7 @@ export function SiteHeader() {
                   key={model}
                   href={`/iphone/${model.toLowerCase().replace(/\s+/g, "-")}`}
                   onClick={closeMobileMenu}
-                  className="flex h-9 items-center justify-center rounded-full border border-border bg-background text-[11px] font-bold text-foreground transition-all hover:border-foreground/30"
+                  className="flex h-9 min-w-0 items-center justify-center rounded-full border border-border bg-background px-2 text-center text-[10px] font-bold leading-tight text-foreground transition-all hover:border-foreground/30 min-[360px]:text-[11px]"
                 >
                   {model}
                 </Link>
@@ -606,29 +606,15 @@ export function SiteHeader() {
         </div>
 
         {/* Bottom Sticky CTA Bar */}
-        <div className="border-t border-border/40 bg-background px-6 pt-4 pb-2 shrink-0">
-          <button
+        <div className="border-t border-border/40 bg-background px-4 pt-4 pb-2 shrink-0">
+          <Link
+            href="/account"
             className="w-full flex h-11 items-center justify-center gap-2 rounded-full border border-[#ff5500] bg-white text-[12px] font-semibold text-[#ff5500] hover:bg-[#ff5500]/5 transition shadow-sm font-sans"
-            onClick={() => {
-              setMobileOpen(false);
-              openCart();
-            }}
+            onClick={closeMobileMenu}
           >
-            <ShoppingBag size={14} className="shrink-0 text-[#ff5500]" />
-            <span className="leading-none">View Bag</span>
-            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#ff5500] text-[10px] font-bold text-white leading-none pt-[0.5px]">
-              {itemCount}
-            </span>
-          </button>
-
-          {/* Footer Badges */}
-          <div className="flex justify-center items-center gap-1.5 text-[8px] font-bold uppercase tracking-wider text-muted-foreground/80 pt-3 pb-1">
-            <span>Free shipping across India</span>
-            <span className="text-muted-foreground/30">•</span>
-            <span>COD available</span>
-            <span className="text-muted-foreground/30">•</span>
-            <span>7-day returns</span>
-          </div>
+            <User size={14} className="shrink-0 text-[#ff5500]" />
+            <span className="leading-none">My Account</span>
+          </Link>
         </div>
       </div>
     </>

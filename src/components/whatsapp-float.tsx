@@ -5,6 +5,10 @@ import { MessageCircle } from "lucide-react";
 import { siteConfig } from "@/lib/site";
 
 export function WhatsAppFloat() {
+  if (!siteConfig.whatsappPhone) {
+    return null;
+  }
+
   const message = encodeURIComponent(
     "Hi The iPhone Project, I need help choosing the right iPhone cover.",
   );

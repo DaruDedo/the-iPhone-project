@@ -74,7 +74,7 @@ export default function CheckoutPage() {
   const total = subtotal + shipping;
 
   const whatsappUrl = useMemo(() => {
-    if (!placedOrderDetails) return "";
+    if (!placedOrderDetails || !siteConfig.whatsappPhone) return "";
 
     const message = `Hi The iPhone Project! I just placed an order.
 Order Number: ${placedOrderDetails.orderNumber}
@@ -201,17 +201,19 @@ Please confirm my order!`;
               )}
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] px-6 py-2.5 text-sm font-semibold text-white transition"
-                >
-                  <svg className="size-4 fill-current" viewBox="0 0 24 24">
-                    <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.333 4.982L2 22l5.202-1.362a9.92 9.92 0 0 0 4.808 1.24h.005c5.505 0 9.99-4.479 9.99-9.987C22.007 6.478 17.521 2 12.012 2zm5.727 14.12c-.25.707-1.464 1.3-2.008 1.383-.49.076-1.127.135-3.266-.752-2.735-1.135-4.5-3.914-4.637-4.096-.137-.182-1.107-1.472-1.107-2.81 0-1.337.7-1.996.95-2.262.25-.266.545-.333.727-.333h.523c.182 0 .428-.067.668.514.25.602.85 2.083.923 2.23.072.15.12.327.02.523-.1.196-.15.319-.296.49-.145.17-.304.382-.435.513-.146.147-.3.308-.13.602.17.294.755 1.25 1.623 2.023.717.638 1.32.836 1.603.954.282.118.446.1.614-.095.168-.196.726-.847.922-1.137.196-.29.39-.24.66-.14.27.1.1.722.56.924.46.202 2.9.155 3.396.9.197.29.3.626.046 1.332z" />
-                  </svg>
-                  Confirm on WhatsApp
-                </a>
+                {whatsappUrl && (
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] hover:bg-[#20ba59] px-6 py-2.5 text-sm font-semibold text-white transition"
+                  >
+                    <svg className="size-4 fill-current" viewBox="0 0 24 24">
+                      <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.333 4.982L2 22l5.202-1.362a9.92 9.92 0 0 0 4.808 1.24h.005c5.505 0 9.99-4.479 9.99-9.987C22.007 6.478 17.521 2 12.012 2zm5.727 14.12c-.25.707-1.464 1.3-2.008 1.383-.49.076-1.127.135-3.266-.752-2.735-1.135-4.5-3.914-4.637-4.096-.137-.182-1.107-1.472-1.107-2.81 0-1.337.7-1.996.95-2.262.25-.266.545-.333.727-.333h.523c.182 0 .428-.067.668.514.25.602.85 2.083.923 2.23.072.15.12.327.02.523-.1.196-.15.319-.296.49-.145.17-.304.382-.435.513-.146.147-.3.308-.13.602.17.294.755 1.25 1.623 2.023.717.638 1.32.836 1.603.954.282.118.446.1.614-.095.168-.196.726-.847.922-1.137.196-.29.39-.24.66-.14.27.1.1.722.56.924.46.202 2.9.155 3.396.9.197.29.3.626.046 1.332z" />
+                    </svg>
+                    Confirm on WhatsApp
+                  </a>
+                )}
                 <Link
                   href={`/track-order`}
                   className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-foreground px-6 py-2.5 text-sm font-semibold text-background hover:opacity-90 transition"
@@ -219,7 +221,7 @@ Please confirm my order!`;
                   Track order
                 </Link>
                 <Link
-                  href="/#shop"
+                  href="/shop"
                   className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border border-border px-6 py-2.5 text-sm font-semibold hover:border-foreground/35 transition"
                 >
                   Continue shopping
@@ -234,7 +236,7 @@ Please confirm my order!`;
                 and quantity will appear here.
               </p>
               <Link
-                href="/#shop"
+                href="/shop"
                 className="mt-6 inline-flex rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background"
               >
                 Shop covers
@@ -261,7 +263,7 @@ Please confirm my order!`;
                 <div className="grid gap-4 md:grid-cols-2">
                   {[
                     ["Full name", "Aarav Sharma", "name"],
-                    ["Phone", siteConfig.phone, "phone"],
+                    ["Phone", "10-digit mobile number", "phone"],
                     ["Email", "you@email.com", "email"],
                     ["PIN code", "560001", "pincode"],
                   ].map(([label, placeholder, name]) => (

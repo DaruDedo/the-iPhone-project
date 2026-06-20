@@ -82,13 +82,13 @@ export function CartDrawer() {
       )}
       <aside
         data-testid="cart-drawer"
-        className={`fixed right-0 top-0 z-[90] flex h-dvh w-full max-w-md flex-col bg-[#FAF9F6] shadow-2xl transition-transform duration-300 ${
+        className={`fixed right-0 top-0 z-[90] flex h-dvh w-dvw max-w-[min(28rem,100dvw)] flex-col overflow-x-hidden bg-[#FAF9F6] shadow-2xl transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         aria-hidden={!isOpen}
       >
         {/* Header Section */}
-        <div className="flex h-16 flex-col justify-center border-b border-border/40 bg-background px-3.5 shrink-0 relative">
+        <div className="flex h-16 min-w-0 flex-col justify-center border-b border-border/40 bg-background px-3.5 shrink-0 relative">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-3xl font-extrabold tracking-tight uppercase text-foreground leading-none">
               Your Bag
@@ -104,7 +104,7 @@ export function CartDrawer() {
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto no-scrollbar px-3.5 py-4 space-y-4">
+        <div className="flex-1 overflow-x-hidden overflow-y-auto no-scrollbar px-3.5 py-4 space-y-4">
           {items.length === 0 ? (
             <div className="flex h-full flex-col justify-center text-center">
               <div className="grid size-14 place-items-center rounded-full bg-muted">
@@ -125,7 +125,7 @@ export function CartDrawer() {
                 </div>
               </div>
               <Link
-                href="/#shop"
+                href="/shop"
                 className="mt-6 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background"
                 onClick={closeCart}
               >
@@ -136,8 +136,8 @@ export function CartDrawer() {
             <>
               {/* Free Gift Milestones Progress Bar */}
               {items.length > 0 && (
-                <div className="border border-border/60 bg-background rounded-[16px] p-4 text-xs shadow-sm flex flex-col gap-3.5 shrink-0">
-                  <div className="font-sans text-[12px] text-foreground font-medium">
+                <div className="min-w-0 border border-border/60 bg-background rounded-[16px] p-4 text-xs shadow-sm flex flex-col gap-3.5 shrink-0">
+                  <div className="min-w-0 font-sans text-[12px] text-foreground font-medium">
                     {subtotal < giftOneThreshold ? (
                       <span>
                         Add{" "}
@@ -226,7 +226,7 @@ export function CartDrawer() {
                   return (
                     <article
                       key={key}
-                      className="relative flex gap-2 rounded-[16px] border border-border/60 bg-background p-3 shadow-sm"
+                      className="relative flex min-w-0 gap-2 rounded-[16px] border border-border/60 bg-background p-3 shadow-sm"
                     >
                       {/* Left vertical index/stepper styling */}
                       <div className="flex flex-col items-center gap-1 w-5 shrink-0 pt-0.5 border-r border-border/30 pr-1.5">
@@ -380,9 +380,9 @@ export function CartDrawer() {
                             return (
                               <div
                                 key={coupon.code}
-                                className="flex items-center justify-between px-3.5 py-3"
+                                className="flex min-w-0 items-center justify-between gap-3 px-3.5 py-3"
                               >
-                                <div className="flex flex-col gap-0.5 min-w-0">
+                                <div className="flex min-w-0 flex-col gap-0.5">
                                   <span className="font-display font-bold text-foreground uppercase text-[13px] tracking-wide">
                                     {coupon.code}
                                   </span>
@@ -392,7 +392,7 @@ export function CartDrawer() {
                                 </div>
                                 <button
                                   onClick={() => applyCoupon(coupon.code)}
-                                  className="border border-border/80 rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-medium uppercase transition-all focus:outline-none text-[#595e6a] hover:bg-secondary/40 hover:text-foreground cursor-pointer"
+                                  className="shrink-0 border border-border/80 rounded-[8px] px-4 py-1.5 text-[12px] font-sans font-medium uppercase transition-all focus:outline-none text-[#595e6a] hover:bg-secondary/40 hover:text-foreground cursor-pointer"
                                 >
                                   APPLY
                                 </button>
@@ -405,7 +405,7 @@ export function CartDrawer() {
                 ) : (
                   /* Input Row & Coupons List */
                   <>
-                    <div className="flex h-12 items-center justify-between px-3.5 border-b border-border/40">
+                    <div className="flex h-12 min-w-0 items-center justify-between gap-2 px-3.5 border-b border-border/40">
                       <input
                         type="text"
                         placeholder="ENTER CODE"
@@ -420,7 +420,7 @@ export function CartDrawer() {
                             setCouponInput("");
                           }
                         }}
-                        className="border border-border/80 rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-medium uppercase text-[#595e6a] hover:bg-secondary/40 hover:text-foreground transition-all focus:outline-none"
+                        className="shrink-0 border border-border/80 rounded-[8px] px-4 py-1.5 text-[12px] font-sans font-medium uppercase text-[#595e6a] hover:bg-secondary/40 hover:text-foreground transition-all focus:outline-none"
                       >
                         APPLY
                       </button>
@@ -443,9 +443,9 @@ export function CartDrawer() {
                         return (
                           <div
                             key={coupon.code}
-                            className="flex items-center justify-between px-3.5 py-3"
+                            className="flex min-w-0 items-center justify-between gap-3 px-3.5 py-3"
                           >
-                            <div className="flex flex-col gap-0.5 min-w-0">
+                            <div className="flex min-w-0 flex-col gap-0.5">
                               <span className="font-display font-bold text-foreground uppercase text-[13px] tracking-wide">
                                 {coupon.code}
                               </span>
@@ -457,7 +457,7 @@ export function CartDrawer() {
                               onClick={() =>
                                 isApplied ? setAppliedCoupon("") : applyCoupon(coupon.code)
                               }
-                              className={`border rounded-[8px] px-5 py-1.5 text-[12px] font-sans font-medium uppercase transition-all focus:outline-none ${
+                              className={`shrink-0 border rounded-[8px] px-4 py-1.5 text-[12px] font-sans font-medium uppercase transition-all focus:outline-none ${
                                 isApplied
                                   ? "bg-white border-[#ff5500] text-[#ff5500] shadow-sm"
                                   : "border-border/80 text-[#595e6a] hover:bg-secondary/40 hover:text-foreground"
@@ -514,7 +514,7 @@ export function CartDrawer() {
 
         {/* Footer Totals & Checkout Buttons */}
         {items.length > 0 && (
-          <div className="border-t border-border/40 bg-background p-3.5 py-4 space-y-4 shrink-0">
+          <div className="min-w-0 border-t border-border/40 bg-background p-3.5 py-4 space-y-4 shrink-0">
             {/* Totals Section */}
             <div className="space-y-2.5 text-[11px] font-bold text-muted-foreground uppercase tracking-wider font-sans">
               {showTotalsDetails && (
@@ -569,10 +569,10 @@ export function CartDrawer() {
               <Link
                 href="/checkout"
                 onClick={closeCart}
-                className="w-full flex h-12 items-center justify-between rounded-full bg-[linear-gradient(180deg,#ff9d54_0%,#ff5500_100%)] border border-[#e04b00] px-6 text-[12px] font-display font-extrabold tracking-[0.08em] text-[#000000] uppercase hover:opacity-95 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_4px_12px_rgba(255,85,0,0.25)] focus:outline-none"
+                className="w-full flex h-12 items-center justify-between gap-2 rounded-full bg-[linear-gradient(180deg,#ff9d54_0%,#ff5500_100%)] border border-[#e04b00] px-5 text-[11px] font-display font-extrabold tracking-[0.05em] text-[#000000] uppercase hover:opacity-95 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_4px_12px_rgba(255,85,0,0.25)] focus:outline-none min-[360px]:px-6 min-[360px]:text-[12px] min-[360px]:tracking-[0.08em]"
               >
                 <ShoppingBag size={16} className="text-[#000000]" />
-                <span>Proceed to Checkout</span>
+                <span className="min-w-0 truncate">Proceed to Checkout</span>
                 <ArrowRight size={16} className="text-[#000000]" />
               </Link>
             </div>

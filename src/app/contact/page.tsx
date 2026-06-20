@@ -16,7 +16,7 @@ export default function ContactPage() {
       intro="Reach out for order help, fit questions, returns, warranty, and bulk enquiries."
       items={[
         { title: "Email", text: siteConfig.email },
-        { title: "WhatsApp", text: siteConfig.phone },
+        ...(siteConfig.phone ? [{ title: "WhatsApp", text: siteConfig.phone }] : []),
         { title: "Hours", text: "Monday to Saturday, 10 AM to 7 PM IST." },
       ]}
     />

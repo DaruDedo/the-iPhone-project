@@ -87,7 +87,7 @@ export default async function CombosPage() {
             <h2 className="text-4xl font-bold md:text-6xl">Combo-ready products.</h2>
           </div>
           <Link
-            href="/#shop"
+            href="/shop"
             className="rounded-full border border-border px-5 py-2 text-sm font-medium transition hover:border-foreground/35"
           >
             All products

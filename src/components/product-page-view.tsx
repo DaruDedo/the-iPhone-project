@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/product-card";
 import { ProductFaq } from "@/components/product-faq";
 import { ProductPurchasePanel } from "@/components/product-purchase-panel";
 import { ProductReviews } from "@/components/product-reviews";
+import { ProductViewEvent } from "@/components/product-view-event";
 import { ProductWhyUs } from "@/components/product-why-us";
 import { getProductBySlug, getProducts } from "@/lib/catalog";
 import { getProductFaqs } from "@/lib/product-faqs";
@@ -46,6 +47,7 @@ export async function ProductPageView({ slug }: { slug: string }) {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <JsonLd data={pageJsonLd} />
+      <ProductViewEvent product={product} />
       <section className="mx-auto grid max-w-7xl gap-7 px-3 py-6 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.85fr)] lg:items-start lg:gap-10 lg:py-12">
         <div className="lg:col-start-1">
           <ProductGallery product={product} />
@@ -82,7 +84,7 @@ export async function ProductPageView({ slug }: { slug: string }) {
             </p>
             <h2 className="text-4xl font-bold md:text-5xl">You may also like.</h2>
           </div>
-          <Link href="/#shop" className="hidden text-sm font-medium md:block">
+          <Link href="/shop" className="hidden text-sm font-medium md:block">
             View all
           </Link>
         </div>

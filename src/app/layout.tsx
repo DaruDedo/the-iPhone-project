@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { CartDrawer } from "@/components/cart-drawer";
 import { CartProvider } from "@/components/cart-provider";
 import { GlobalToastEvents } from "@/components/global-toast-events";
+import { MarketingPixels } from "@/components/marketing-pixels";
+import { ScrollRestoration } from "@/components/scroll-restoration";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Toaster } from "@/components/ui/sonner";
@@ -73,6 +75,8 @@ export default function RootLayout({
       <body>
         <CartProvider>
           <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
+          <ScrollRestoration />
+          <MarketingPixels />
           <SiteHeader />
           {children}
           <SiteFooter />

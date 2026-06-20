@@ -27,8 +27,15 @@ export async function GET() {
   <g:price>${escapeXml(`${product.price}.00 INR`)}</g:price>
   <g:brand>${escapeXml(siteConfig.name)}</g:brand>
   <g:condition>new</g:condition>
+  <g:identifier_exists>false</g:identifier_exists>
+  <g:google_product_category>Electronics &gt; Communications &gt; Telephony &gt; Mobile Phone Accessories &gt; Mobile Phone Cases</g:google_product_category>
   <g:product_type>${escapeXml(product.category)}</g:product_type>
   <g:custom_label_0>${escapeXml(product.selectedModel?.name ?? "Universal")}</g:custom_label_0>
+  <g:shipping>
+    <g:country>IN</g:country>
+    <g:service>Standard</g:service>
+    <g:price>0.00 INR</g:price>
+  </g:shipping>
 </item>`,
     )
     .join("\n");

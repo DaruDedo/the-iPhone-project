@@ -83,14 +83,30 @@
 
   html {
     scroll-behavior: smooth;
+    max-width: 100%;
+    overflow-x: clip;
   }
 
   body {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: clip;
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  body > * {
+    min-width: 0;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
   }
 
   h1,
@@ -105,6 +121,13 @@
   }
 }
 
+@supports not (overflow: clip) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}
+
 @keyframes scroll {
   from {
     transform: translateX(0);
@@ -113,6 +136,11 @@
   to {
     transform: translateX(-50%);
   }
+}
+
+.overflow-wrap-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 [data-sonner-toast].tip-toast-badge {
@@ -238,7 +266,7 @@
 }
 
 .tip-nav-shell-mobile {
-  border-radius: 0 0 1rem 1rem;
+  border-radius: 0 0 1.75rem 1.75rem;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
     0 12px 38px rgba(0, 0, 0, 0.09),

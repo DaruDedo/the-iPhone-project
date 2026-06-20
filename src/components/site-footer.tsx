@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { siteConfig } from "@/lib/site";
+
 export function SiteFooter() {
   return (
     <footer id="support" className="border-t border-border">
@@ -16,7 +18,7 @@ export function SiteFooter() {
           <p className="mb-3 font-bold">Shop</p>
           <ul className="space-y-2 text-xs text-muted-foreground">
             <li>
-              <Link href="/#shop">All products</Link>
+              <Link href="/shop">All products</Link>
             </li>
             <li>
               <Link href="/category/covers-cases">Covers & Cases</Link>
@@ -39,26 +41,37 @@ export function SiteFooter() {
           <p className="mb-3 font-bold">Support</p>
           <ul className="space-y-2 text-xs text-muted-foreground">
             <li>
+              <Link href="/contact">Contact</Link>
+            </li>
+            <li>
+              <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+            </li>
+            {siteConfig.phone && (
+              <li>
+                <a href={`tel:${siteConfig.phone.replace(/[^+\d]/g, "")}`}>{siteConfig.phone}</a>
+              </li>
+            )}
+            <li>
               <Link href="/shipping">Shipping</Link>
             </li>
             <li>
-              <Link href="/returns">Returns</Link>
+              <Link href="/returns">Return/refund policy</Link>
             </li>
             <li>
-              <Link href="/warranty">Warranty</Link>
-            </li>
-            <li>
-              <Link href="/contact">Contact</Link>
+              <Link href="/warranty">Warranty policy</Link>
             </li>
           </ul>
         </div>
         <div>
           <p className="mb-3 font-bold">Company</p>
           <ul className="space-y-2 text-xs text-muted-foreground">
-            <li>About</li>
-            <li>Press</li>
-            <li>Privacy</li>
-            <li>Terms</li>
+            <li>
+              <Link href="/privacy">Privacy policy</Link>
+            </li>
+            <li>
+              <Link href="/terms">Terms</Link>
+            </li>
+            <li>{siteConfig.businessAddress}</li>
           </ul>
         </div>
       </div>
