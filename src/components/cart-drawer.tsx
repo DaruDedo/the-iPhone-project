@@ -62,6 +62,27 @@ export function CartDrawer() {
     }).catch(() => {});
   }
 
+  const handleCheckoutClick = () => {
+    void fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        eventName: "checkout_started",
+        payload: {
+          subtotal,
+          itemCount: items.reduce((total, item) => total + item.quantity, 0),
+          items: items.map((item) => ({
+            slug: item.slug,
+            name: item.name,
+            model: item.model,
+            quantity: item.quantity,
+          })),
+        },
+      }),
+    }).catch(() => {});
+    closeCart();
+  };
+
   return (
     <>
       <style>{`
@@ -568,7 +589,7 @@ export function CartDrawer() {
             <div className="pt-2">
               <Link
                 href="/checkout"
-                onClick={closeCart}
+                onClick={handleCheckoutClick}
                 className="w-full flex h-12 items-center justify-between gap-2 rounded-full bg-[linear-gradient(180deg,#ff9d54_0%,#ff5500_100%)] border border-[#e04b00] px-5 text-[11px] font-display font-extrabold tracking-[0.05em] text-[#000000] uppercase hover:opacity-95 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_4px_12px_rgba(255,85,0,0.25)] focus:outline-none min-[360px]:px-6 min-[360px]:text-[12px] min-[360px]:tracking-[0.08em]"
               >
                 <ShoppingBag size={16} className="text-[#000000]" />

@@ -634,6 +634,11 @@ export default function AdminPage() {
           .filter(Boolean),
         mediaUrls: appendedMediaUrls,
         stock: Number(editStock),
+        existingImages: editingProduct.images.map((img, idx) => ({
+          id: img.id,
+          sortOrder: idx,
+          isPrimary: idx === 0,
+        })),
       };
 
       const res = await fetch("/api/admin/catalog", {
@@ -748,7 +753,7 @@ export default function AdminPage() {
             <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Admin</p>
             <h1 className="mt-2 text-4xl font-bold md:text-6xl">Product panel.</h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 hidden md:flex">
             <Link
               href="/admin"
               className="rounded-full border border-border px-4 py-2 text-sm hover:border-foreground/40"
@@ -798,6 +803,28 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {/* Quick Navigation Control for Mobile */}
+        <div className="mt-6 flex gap-2 rounded-2xl border border-border bg-muted/30 p-1.5 md:hidden">
+          <a
+            href="#product-engine"
+            className="flex-1 rounded-xl bg-card py-2 text-center text-xs font-semibold shadow-sm border border-border/40 text-foreground transition active:scale-[0.98]"
+          >
+            Create Product
+          </a>
+          <a
+            href="#catalog-section"
+            className="flex-1 rounded-xl bg-card py-2 text-center text-xs font-semibold shadow-sm border border-border/40 text-foreground transition active:scale-[0.98]"
+          >
+            All Products
+          </a>
+          <a
+            href="#orders-section"
+            className="flex-1 rounded-xl bg-card py-2 text-center text-xs font-semibold shadow-sm border border-border/40 text-foreground transition active:scale-[0.98]"
+          >
+            Orders
+          </a>
+        </div>
+
         {catalog?.devMode && (
           <div className="mt-6 rounded-2xl bg-muted/60 p-4 text-sm text-muted-foreground">
             Database URL is not configured, so admin is showing fallback/dev data. Add DATABASE_URL
@@ -837,9 +864,9 @@ export default function AdminPage() {
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[460px_1fr]">
           <div className="grid h-fit gap-6">
-            <section className="rounded-3xl border border-border bg-card p-6">
+            <section id="product-engine" className="rounded-3xl border border-border bg-card p-4 sm:p-6">
               <h2 className="text-2xl font-bold">Product engine</h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              <p className="mt-2 text-sm leading-6 text-muted-foreground hidden md:block">
                 Choose a category and template first. Empty description, features, FAQs, specs, and
                 SEO fields are filled automatically on the storefront.
               </p>
@@ -904,7 +931,7 @@ export default function AdminPage() {
                           <button
                             key={model.slug}
                             type="button"
-                            className={`rounded-full border px-3 py-1.5 text-xs transition ${
+                            className={`rounded-full border px-2.5 py-1 text-[11px] sm:px-3 sm:py-1.5 sm:text-xs transition ${
                               selected
                                 ? "border-foreground bg-foreground text-background"
                                 : "border-border bg-background text-foreground hover:border-foreground/40"
@@ -922,7 +949,7 @@ export default function AdminPage() {
             </section>
 
             <form
-              className="h-fit rounded-3xl border border-border bg-card p-6"
+              className="h-fit rounded-3xl border border-border bg-card p-4 sm:p-6"
               onSubmit={handleCreateProduct}
             >
               <h2 className="text-2xl font-bold">Add single product</h2>
@@ -950,7 +977,7 @@ export default function AdminPage() {
                   placeholder={`Price ${selectedTemplate?.defaultPrice ?? ""}`}
                   className="h-11 rounded-2xl border border-border bg-background px-4 text-sm outline-none"
                 />
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <input
                     name="tag"
                     placeholder={`Tag ${selectedTemplate?.defaultTag ?? ""}`}
@@ -974,7 +1001,7 @@ export default function AdminPage() {
                       <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
                         Product images
                       </p>
-                      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      <p className="mt-1 text-xs leading-5 text-muted-foreground hidden md:block">
                         Upload multiple images. First image becomes the main product image; the rest
                         become gallery images.
                       </p>
@@ -1044,7 +1071,7 @@ export default function AdminPage() {
                       <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
                         Videos / extra media
                       </p>
-                      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      <p className="mt-1 text-xs leading-5 text-muted-foreground hidden md:block">
                         Upload MP4/WebM videos or extra media for the product detail gallery.
                       </p>
                     </div>
@@ -1125,11 +1152,11 @@ export default function AdminPage() {
             </form>
 
             <form
-              className="h-fit rounded-3xl border border-border bg-card p-6"
+              className="h-fit rounded-3xl border border-border bg-card p-4 sm:p-6"
               onSubmit={handleBulkCreate}
             >
               <h2 className="text-2xl font-bold">Bulk add products</h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              <p className="mt-2 text-sm leading-6 text-muted-foreground hidden md:block">
                 Upload 10-20 primary images. Filenames become product names, and the template fills
                 content, specs, FAQs, reviews, and SEO defaults.
               </p>
@@ -1147,7 +1174,7 @@ export default function AdminPage() {
                   placeholder={`Price ${selectedTemplate?.defaultPrice ?? ""}`}
                   className="h-11 rounded-2xl border border-border bg-background px-4 text-sm outline-none"
                 />
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <input
                     name="bulkTag"
                     placeholder={`Tag ${selectedTemplate?.defaultTag ?? ""}`}
@@ -1198,9 +1225,9 @@ export default function AdminPage() {
           </div>
 
           <div className="grid gap-6">
-            <section className="rounded-3xl border border-border bg-card p-6">
+            <section id="catalog-section" className="rounded-3xl border border-border bg-card p-4 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-4">
-                <h2 className="text-2xl font-bold">Products</h2>
+                <h2 className="text-2xl font-bold">All Products</h2>
                 <div className="flex flex-wrap items-center gap-2">
                   <input
                     type="text"
@@ -1227,49 +1254,51 @@ export default function AdminPage() {
                 {filteredProducts.map((product) => (
                   <article
                     key={product.id}
-                    className="grid grid-cols-[64px_1fr_auto] gap-4 rounded-2xl border border-border p-3"
+                    className="flex flex-col gap-3 rounded-2xl border border-border p-3 sm:grid sm:grid-cols-[64px_1fr_auto] sm:gap-4"
                   >
-                    <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
-                      <Image
-                        src={product.image.url}
-                        alt={product.image.alt}
-                        fill
-                        sizes="64px"
-                        className="object-cover"
-                      />
+                    <div className="flex gap-4 items-start sm:contents">
+                      <div className="relative aspect-square size-16 shrink-0 overflow-hidden rounded-xl bg-muted">
+                        <Image
+                          src={product.image.url}
+                          alt={product.image.alt}
+                          fill
+                          sizes="64px"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-bold truncate">{product.name}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {product.category} / {formatPrice(product.price)}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {product.requiresModelFit
+                            ? `${product.modelOptions.filter((model) => model.isAvailable).length} active variants`
+                            : "Universal variant"}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold">{product.name}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {product.category} / {formatPrice(product.price)}
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {product.requiresModelFit
-                          ? `${product.modelOptions.filter((model) => model.isAvailable).length} active variants`
-                          : "Universal variant"}
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-wrap gap-2 sm:flex-col sm:gap-2">
                       <Link
                         href={`/products/${product.categorySlug}/${product.slug}`}
-                        className="h-9 rounded-full border border-border px-3 text-center text-xs leading-9 transition hover:border-foreground/35"
+                        className="flex-1 sm:flex-none text-center h-8 rounded-full border border-border px-3 text-xs leading-8 transition sm:h-9 sm:leading-9 hover:border-foreground/35"
                       >
                         View
                       </Link>
                       <button
-                        className="h-9 rounded-full border border-border px-3 text-xs"
+                        className="flex-1 sm:flex-none h-8 rounded-full border border-border px-3 text-xs sm:h-9"
                         onClick={() => openEditModal(product)}
                       >
                         Edit
                       </button>
                       <button
-                        className="h-9 rounded-full border border-border px-3 text-xs"
+                        className="flex-1 sm:flex-none h-8 rounded-full border border-border px-3 text-xs sm:h-9"
                         onClick={() => toggleProduct(product)}
                       >
                         {product.isActive ? "Active" : "Hidden"}
                       </button>
                       <button
-                        className="h-9 rounded-full border border-destructive/30 px-3 text-xs text-destructive"
+                        className="flex-1 sm:flex-none h-8 rounded-full border border-destructive/30 px-3 text-xs text-destructive sm:h-9"
                         onClick={() => deleteProduct(product)}
                       >
                         Delete
@@ -1280,7 +1309,7 @@ export default function AdminPage() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border-border bg-card p-6">
+            <section id="orders-section" className="rounded-3xl border border-border bg-card p-4 sm:p-6">
               <h2 className="text-2xl font-bold">Orders</h2>
               <div className="mt-5 grid gap-3">
                 {orders.length === 0 ? (
@@ -1330,8 +1359,8 @@ export default function AdminPage() {
 
       {/* Interactive Edit Modal */}
       {isEditModalOpen && editingProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-md">
-          <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card/90 p-6 shadow-2xl backdrop-blur-xl md:p-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-0 sm:p-4 backdrop-blur-md">
+          <div className="relative w-full h-full sm:h-auto max-w-3xl max-h-screen sm:max-h-[90vh] overflow-y-auto rounded-none sm:rounded-3xl border-0 sm:border border-border bg-card/90 p-6 shadow-2xl backdrop-blur-xl md:p-8">
             <div className="flex items-center justify-between border-b border-border pb-4">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -1555,9 +1584,56 @@ export default function AdminPage() {
                                 </span>
                               </div>
                             )}
-                            <span className="absolute left-1.5 top-1.5 rounded-full bg-white/85 px-2 py-0.5 text-[9px] font-semibold shadow-sm backdrop-blur">
+                            <span className="absolute left-1.5 top-1.5 rounded-full bg-white/90 px-2 py-0.5 text-[9px] font-bold text-black shadow-sm backdrop-blur">
                               {image.isPrimary || index === 0 ? "Main" : index + 1}
                             </span>
+
+                            {/* Reordering Controls */}
+                            <div className="absolute inset-x-0 bottom-1.5 flex justify-between px-1.5">
+                              {index > 0 ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newImages = [...editingProduct.images];
+                                    const temp = newImages[index];
+                                    newImages[index] = newImages[index - 1];
+                                    newImages[index - 1] = temp;
+                                    setEditingProduct({
+                                      ...editingProduct,
+                                      images: newImages,
+                                    });
+                                  }}
+                                  className="flex size-6 items-center justify-center rounded-full bg-white text-black shadow-lg hover:bg-zinc-100 transition active:scale-95 cursor-pointer text-xs font-extrabold"
+                                  title="Move Left"
+                                >
+                                  ←
+                                </button>
+                              ) : (
+                                <div className="size-6" />
+                              )}
+
+                              {index < editingProduct.images.length - 1 ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newImages = [...editingProduct.images];
+                                    const temp = newImages[index];
+                                    newImages[index] = newImages[index + 1];
+                                    newImages[index + 1] = temp;
+                                    setEditingProduct({
+                                      ...editingProduct,
+                                      images: newImages,
+                                    });
+                                  }}
+                                  className="flex size-6 items-center justify-center rounded-full bg-white text-black shadow-lg hover:bg-zinc-100 transition active:scale-95 cursor-pointer text-xs font-extrabold"
+                                  title="Move Right"
+                                >
+                                  →
+                                </button>
+                              ) : (
+                                <div className="size-6" />
+                              )}
+                            </div>
                           </div>
                           <p className="mt-1 truncate text-[10px] text-muted-foreground">
                             {image.alt || image.url}

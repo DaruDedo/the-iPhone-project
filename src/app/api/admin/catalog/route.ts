@@ -210,6 +210,20 @@ export async function PATCH(request: Request) {
       }
     }
 
+    // Update existing gallery sorting/primary order
+    if (payload.existingImages && Array.isArray(payload.existingImages)) {
+      for (const img of payload.existingImages) {
+        await db
+          .update(schema.productImages)
+          .set({
+            sortOrder: img.sortOrder,
+            isPrimary: img.isPrimary,
+            updatedAt: new Date(),
+          })
+          .where(eq(schema.productImages.id, img.id));
+      }
+    }
+
     // Append new media/images to the product gallery
     if (payload.mediaUrls && Array.isArray(payload.mediaUrls) && payload.mediaUrls.length > 0) {
       const existingImages = await db.query.productImages.findMany({

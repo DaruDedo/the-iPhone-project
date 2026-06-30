@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { ProductCard } from "@/components/product-card";
 import { getIphoneModels, getProductCategories, getProducts } from "@/lib/catalog";
+import { getDb } from "@/db/client";
+import { analyticsEvents } from "@/db/schema";
 
 export const metadata: Metadata = {
   title: "Search",
@@ -22,6 +24,21 @@ export default async function SearchPage({
   const query = await searchParams;
   const searchTerm = Array.isArray(query.q) ? query.q[0] : (query.q ?? "");
   const normalizedSearch = normalize(searchTerm);
+
+  if (searchTerm.trim()) {
+    const db = getDb();
+    if (db) {
+      try {
+        await db.insert(analyticsEvents).values({
+          eventName: "search",
+          source: "direct",
+          payload: { query: searchTerm.trim() },
+        });
+      } catch (error) {
+        console.error("Failed to log search event:", error);
+      }
+    }
+  }
   const [products, categories, models] = await Promise.all([
     getProducts(),
     getProductCategories(),

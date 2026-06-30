@@ -1,10 +1,13 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, gte } from "drizzle-orm";
 import { NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
 
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
 import { sendOrderStatusUpdateEmail } from "@/lib/emails";
 import { isAdminError, requireAdmin } from "@/lib/admin-auth";
+import { getTimeframeStartDate } from "@/lib/timeframe";
 
 type OrderStatus = "new" | "confirmed" | "packed" | "shipped" | "delivered" | "cancelled";
 
@@ -23,10 +26,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ orders: [], devMode: true });
   }
 
+  const { searchParams } = new URL(request.url);
+  const timeframe = searchParams.get("timeframe");
+  const startDate = getTimeframeStartDate(timeframe);
+
   try {
     const orders = await db.query.orders.findMany({
+      where: gte(schema.orders.createdAt, startDate),
       orderBy: [desc(schema.orders.createdAt)],
-      limit: 50,
+      limit: 100,
       with: {
         items: true,
       },

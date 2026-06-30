@@ -1,3 +1,4 @@
+import { eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { getDb } from "@/db/client";
@@ -52,16 +53,44 @@ export async function POST(request: Request) {
     }
 
     if (body.type) {
-      await db.insert(schema.leads).values({
-        type: body.type,
-        name: body.name ?? null,
-        phone: cleanPhone,
-        email: body.email ?? null,
-        source,
-        payload,
-        lastActiveAt: new Date(),
-        updatedAt: new Date(),
-      });
+      const checkoutSessionId = payload.checkoutSessionId as string | undefined;
+      let existingLead = null;
+
+      if (checkoutSessionId) {
+        existingLead = await db.query.leads.findFirst({
+          where: sql`${schema.leads.payload}->>'checkoutSessionId' = ${checkoutSessionId}`,
+        });
+      }
+
+      if (existingLead) {
+        // Update existing lead progress
+        await db
+          .update(schema.leads)
+          .set({
+            name: body.name || existingLead.name,
+            phone: cleanPhone || existingLead.phone,
+            email: body.email || existingLead.email,
+            payload: {
+              ...(existingLead.payload as Record<string, any>),
+              ...payload,
+            },
+            lastActiveAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(schema.leads.id, existingLead.id));
+      } else {
+        // Create new lead record
+        await db.insert(schema.leads).values({
+          type: body.type,
+          name: body.name ?? null,
+          phone: cleanPhone,
+          email: body.email ?? null,
+          source,
+          payload,
+          lastActiveAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
     }
 
     return NextResponse.json({ ok: true });
@@ -71,7 +100,7 @@ export async function POST(request: Request) {
         error:
           error instanceof Error
             ? error.message
-            : "Could not save lead. Run sales-system-migration.sql.",
+            : "Could not save lead.",
       },
       { status: 500 },
     );

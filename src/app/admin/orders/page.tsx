@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getSupabaseBrowserClientAsync } from "@/lib/supabase/browser";
+import { useTimeframe } from "@/context/admin-timeframe-context";
 import { formatPrice } from "@/data/products";
 
 type AdminOrderItem = {
@@ -51,6 +52,7 @@ type AdminOrder = {
 const orderStatuses = ["new", "confirmed", "packed", "shipped", "delivered", "cancelled"];
 
 export default function AdminOrdersPage() {
+  const { timeframe } = useTimeframe();
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -78,7 +80,7 @@ export default function AdminOrdersPage() {
     setError("");
     try {
       const headers = await getHeaders();
-      const res = await fetch("/api/admin/orders", { headers });
+      const res = await fetch(`/api/admin/orders?timeframe=${timeframe}`, { headers });
       if (!res.ok) {
         const errData = (await res.json()) as { error?: string };
         throw new Error(errData.error || "Failed to load orders");
@@ -90,7 +92,7 @@ export default function AdminOrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [getHeaders]);
+  }, [getHeaders, timeframe]);
 
   useEffect(() => {
     void loadOrders();

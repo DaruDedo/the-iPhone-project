@@ -36,7 +36,7 @@ function createGalleryItems(product: Product): GalleryItem[] {
     ),
   ];
 
-  return media.map<GalleryItem>((item, index) => {
+  const mapped = media.map<GalleryItem>((item, index) => {
     const kind = getMediaKind(item);
 
     return {
@@ -46,6 +46,15 @@ function createGalleryItems(product: Product): GalleryItem[] {
       embedUrl: item.embedUrl ?? getInstagramEmbedUrl(item.url),
     };
   });
+
+  const images = mapped.filter((item) => item.kind !== "video" && item.kind !== "instagram");
+  const videos = mapped.filter((item) => item.kind === "video" || item.kind === "instagram");
+
+  const combined = [...images, ...videos];
+  return combined.map((item, index) => ({
+    ...item,
+    label: index === 0 ? "Main view" : `Gallery media ${index + 1}`,
+  }));
 }
 
 function MediaIcon({ kind }: { kind: ProductMediaKind }) {
@@ -223,7 +232,7 @@ export function ProductGallery({ product }: { product: Product }) {
           <button
             key={`${item.id}-${index}`}
             aria-label={item.label}
-            className={`relative h-16 w-16 shrink-0 overflow-hidden bg-muted transition sm:h-20 sm:w-20 lg:w-full ${
+            className={`relative h-16 w-16 shrink-0 overflow-hidden bg-transparent transition sm:h-20 sm:w-20 lg:w-full ${
               active === index ? "ring-2 ring-foreground/15" : "hover:opacity-90"
             }`}
             style={{
@@ -234,7 +243,6 @@ export function ProductGallery({ product }: { product: Product }) {
           >
             {item.kind === "image" ? (
               <>
-                <div className="absolute inset-0" style={{ background: product.tint }} />
                 <Image src={item.url} alt="" fill sizes="80px" className="object-contain" />
               </>
             ) : (
@@ -267,7 +275,7 @@ export function ProductGallery({ product }: { product: Product }) {
 
       <div className="order-1 lg:order-2">
         <div
-          className="relative aspect-square overflow-hidden bg-muted"
+          className="relative aspect-square overflow-hidden bg-transparent"
           style={{
             clipPath: "polygon(8% 0, 92% 0, 100% 8%, 100% 92%, 92% 100%, 8% 100%, 0 92%, 0 8%)",
           }}
@@ -275,7 +283,7 @@ export function ProductGallery({ product }: { product: Product }) {
           <div
             className="absolute inset-0"
             style={{
-              background: activeItem?.kind === "image" ? product.tint : "oklch(0.14 0.005 270)",
+              background: activeItem?.kind === "image" ? "transparent" : "oklch(0.14 0.005 270)",
             }}
           />
           {activeItem && <ActiveMedia item={activeItem} product={product} />}

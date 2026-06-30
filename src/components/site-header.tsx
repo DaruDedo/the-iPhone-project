@@ -80,7 +80,11 @@ const shopMenuGroups = [
 const announcement = "Free shipping across India above ₹499";
 
 function BrandMark({ className = "" }: { className?: string }) {
-  return <span className={`font-bold tracking-tight ${className}`}>The iPhone Project</span>;
+  return (
+    <span className={`font-bold tracking-tight ${className}`}>
+      The<span className="text-[#ff5500]">.</span>iPhone<span className="text-[#ff5500]">.</span>Project
+    </span>
+  );
 }
 
 export function SiteHeader() {
@@ -93,6 +97,10 @@ export function SiteHeader() {
   const shopCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { itemCount, openCart } = useCart();
   const pathname = usePathname();
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   useEffect(() => {
     const updateHeaderSurface = () => {
@@ -318,7 +326,7 @@ export function SiteHeader() {
           )}
         </div>
 
-        <div className="tip-nav-shell tip-nav-shell-mobile relative mx-auto flex h-14 w-[calc(100%-1.25rem)] max-w-[calc(100dvw-1.25rem)] items-center justify-between overflow-hidden px-3 backdrop-blur-2xl md:hidden">
+        <div className="tip-nav-shell tip-nav-shell-mobile relative mx-auto flex h-14 w-[calc(100%-1.25rem)] max-w-[calc(100dvw-1.25rem)] items-center justify-between overflow-hidden px-2 backdrop-blur-2xl md:hidden">
           <button
             aria-label="Open navigation"
             className="relative z-10 grid size-10 shrink-0 place-items-center rounded-full border border-white/60 bg-white/38 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_8px_18px_rgba(0,0,0,0.1)] backdrop-blur-xl transition-all hover:bg-white/55 focus:outline-none"
@@ -328,14 +336,14 @@ export function SiteHeader() {
           </button>
           <Link
             href="/"
-            className="relative z-10 min-w-0 max-w-[48%] shrink select-none truncate rounded-full bg-white/72 px-4 py-2 text-center text-[12px] font-bold tracking-tight shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_6px_16px_rgba(0,0,0,0.08)] min-[360px]:text-[13px]"
+            className="relative z-10 min-w-0 max-w-[62%] shrink select-none truncate rounded-full bg-white/72 px-2.5 py-1.5 text-center text-[12px] font-bold tracking-tight shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_6px_16px_rgba(0,0,0,0.08)] min-[360px]:text-[13px] min-[360px]:px-3.5"
             style={{ fontFamily: "'JetBrains Mono', monospace" }}
           >
             <BrandMark />
           </Link>
           <button
             onClick={openCart}
-            className="relative z-10 flex h-10 shrink-0 items-center gap-1 rounded-full border border-[#ff5500] bg-white px-2.5 text-[12px] font-semibold text-[#ff5500] shadow-sm transition-all hover:bg-[#ff5500]/5 focus:outline-none font-sans min-[360px]:gap-1.5 min-[360px]:px-3.5"
+            className="relative z-10 flex h-10 shrink-0 items-center gap-1 rounded-full border border-[#ff5500] bg-white px-2 text-[12px] font-semibold text-[#ff5500] shadow-sm transition-all hover:bg-[#ff5500]/5 focus:outline-none font-sans min-[360px]:gap-1.5 min-[360px]:px-3"
           >
             <ShoppingBag size={12} className="shrink-0 text-[#ff5500]" />
             <span className="max-[370px]:hidden leading-none">Bag</span>

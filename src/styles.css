@@ -102,6 +102,19 @@
     min-width: 0;
   }
 
+  /* Browser Autofill override styles */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-foreground) !important;
+    -webkit-box-shadow: 0 0 0px 1000px var(--color-card) inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+
   img,
   video,
   canvas,
@@ -189,7 +202,6 @@
 .tip-nav-shell {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
   border: 1.25px solid transparent;
   border-top: 0 !important;
   border-radius: 0 0 2rem 2rem;
@@ -381,4 +393,15 @@
     margin-right: auto !important;
     margin-left: auto !important;
   }
+}
+
+.dark {
+  --background: oklch(0.08 0.005 270) !important;
+  --foreground: oklch(0.96 0.005 270) !important;
+  --card: oklch(0.12 0.008 270) !important;
+  --card-foreground: oklch(0.96 0.005 270) !important;
+  --muted: oklch(0.16 0.008 270) !important;
+  --muted-foreground: oklch(0.6 0.01 270) !important;
+  --border: oklch(0.18 0.005 270) !important;
+  --input: oklch(0.14 0.005 270) !important;
 }

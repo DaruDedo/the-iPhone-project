@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getSupabaseBrowserClientAsync } from "@/lib/supabase/browser";
+import { useTimeframe } from "@/context/admin-timeframe-context";
 
 type AdminReview = {
   id: string;
@@ -36,6 +37,7 @@ type CatalogProduct = {
 };
 
 export default function AdminReviewsPage() {
+  const { timeframe } = useTimeframe();
   const [reviews, setReviews] = useState<AdminReview[]>([]);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +74,7 @@ export default function AdminReviewsPage() {
       const headers = await getHeaders();
 
       // Load reviews
-      const reviewsRes = await fetch("/api/admin/reviews", { headers });
+      const reviewsRes = await fetch(`/api/admin/reviews?timeframe=${timeframe}`, { headers });
       if (!reviewsRes.ok) {
         throw new Error("Failed to load reviews");
       }
@@ -93,7 +95,7 @@ export default function AdminReviewsPage() {
     } finally {
       setLoading(false);
     }
-  }, [getHeaders]);
+  }, [getHeaders, timeframe]);
 
   useEffect(() => {
     void loadData();

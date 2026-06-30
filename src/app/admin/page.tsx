@@ -8,6 +8,8 @@ import {
   MessageSquareText,
   PackageCheck,
   Settings,
+  ShoppingCart,
+  Sparkles,
   Users,
 } from "lucide-react";
 
@@ -25,16 +27,34 @@ const adminCards = [
     icon: PackageCheck,
   },
   {
+    title: "AI Visibility",
+    desc: "Track discoverability, bot referrals, shopper search intent, and SEO completeness.",
+    href: "/admin/ai-visibility",
+    icon: Sparkles,
+  },
+  {
     title: "Reviews",
     desc: "Collect, approve, and manage product reviews for better trust and AI visibility.",
     href: "/admin/reviews",
     icon: MessageSquareText,
   },
   {
+    title: "Checkouts",
+    desc: "Monitor real-time keystrokes, form entries, and drop-off exit stages of shoppers.",
+    href: "/admin/checkouts",
+    icon: ShoppingCart,
+  },
+  {
     title: "Leads",
     desc: "View cart leads, coupon leads, checkout drafts, and source tracking events.",
     href: "/admin/leads",
     icon: Users,
+  },
+  {
+    title: "Cart activity",
+    desc: "View live cart additions, item quantities, and selected phone models.",
+    href: "/admin/cart-activity",
+    icon: ShoppingCart,
   },
   {
     title: "Templates",
@@ -93,7 +113,7 @@ export default function AdminDashboardPage() {
                 <Icon className="size-5" />
               </div>
               <h2 className="mt-5 text-2xl font-bold">{title}</h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{desc}</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground hidden md:block">{desc}</p>
               <p className="mt-5 text-sm font-medium">Open panel</p>
             </Link>
           ))}

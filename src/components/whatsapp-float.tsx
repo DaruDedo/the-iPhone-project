@@ -1,10 +1,16 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 import { siteConfig } from "@/lib/site";
 
 export function WhatsAppFloat() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
   if (!siteConfig.whatsappPhone) {
     return null;
   }

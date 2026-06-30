@@ -1,9 +1,12 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, gte } from "drizzle-orm";
 import { NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
 
 import { getDb } from "@/db/client";
 import * as schema from "@/db/schema";
 import { isAdminError, requireAdmin } from "@/lib/admin-auth";
+import { getTimeframeStartDate } from "@/lib/timeframe";
 
 export async function GET(request: Request) {
   const admin = await requireAdmin(request);
@@ -18,8 +21,13 @@ export async function GET(request: Request) {
     return NextResponse.json({ reviews: [], devMode: true });
   }
 
+  const { searchParams } = new URL(request.url);
+  const timeframe = searchParams.get("timeframe");
+  const startDate = getTimeframeStartDate(timeframe);
+
   try {
     const reviews = await db.query.productReviews.findMany({
+      where: gte(schema.productReviews.createdAt, startDate),
       orderBy: [desc(schema.productReviews.createdAt)],
       with: {
         product: true,

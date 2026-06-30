@@ -1,0 +1,403 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  CreditCard,
+  Search,
+  MessageSquare,
+  Mail,
+  ExternalLink,
+  ChevronDown,
+  User,
+  ShoppingBag,
+} from "lucide-react";
+
+import { getSupabaseBrowserClientAsync } from "@/lib/supabase/browser";
+import { useTimeframe } from "@/context/admin-timeframe-context";
+
+type CheckoutDraft = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  address: string;
+  pincode: string;
+  value: number;
+  itemCount: number;
+  items: any[];
+  exitedAt: string;
+  exitBadge: string;
+  badgeColor: string;
+  activeText: string;
+  source: string;
+  createdAt: string;
+};
+
+export default function AdminCheckoutsPage() {
+  const router = useRouter();
+  const { timeframe } = useTimeframe();
+  const [checkouts, setCheckouts] = useState<CheckoutDraft[]>([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStage, setFilterStage] = useState("all"); // 'all', 'fullName', 'phone', 'address'
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const getHeaders = useCallback(async (): Promise<Record<string, string> | null> => {
+    const supabase = await getSupabaseBrowserClientAsync();
+    if (!supabase) return {};
+
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
+      router.push("/admin/login");
+      return null;
+    }
+
+    return {
+      Authorization: `Bearer ${data.session.access_token}`,
+    };
+  }, [router]);
+
+  useEffect(() => {
+    async function loadCheckouts() {
+      setLoading(true);
+      const headers = await getHeaders();
+      if (!headers) return;
+
+      try {
+        const response = await fetch(`/api/admin/checkouts?timeframe=${timeframe}`, { headers });
+        const result = (await response.json()) as {
+          checkouts?: CheckoutDraft[];
+          error?: string;
+        };
+
+        if (!response.ok) {
+          setError(result.error ?? "Could not load checkouts.");
+          return;
+        }
+
+        setCheckouts(result.checkouts ?? []);
+      } catch (err) {
+        setError("Failed to fetch checkouts.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void loadCheckouts();
+  }, [getHeaders, timeframe]);
+
+  // Compute stats based on current list
+  const stats = useMemo(() => {
+    const total = checkouts.length;
+    const droppedAtStart = checkouts.filter((c) => c.exitedAt === "fullName").length;
+    const contactCaptured = checkouts.filter((c) => c.phone !== "No contact yet").length;
+    const totalLeakedValue = checkouts.reduce((acc, c) => acc + c.value, 0);
+
+    return {
+      total,
+      droppedAtStart,
+      contactCaptured,
+      totalLeakedValue,
+    };
+  }, [checkouts]);
+
+  // Filter list
+  const filteredCheckouts = useMemo(() => {
+    return checkouts.filter((c) => {
+      const query = searchQuery.toLowerCase().trim();
+      const matchesSearch = query
+        ? c.name.toLowerCase().includes(query) ||
+          c.phone.includes(query) ||
+          c.email.toLowerCase().includes(query) ||
+          c.items.some((item) => item.name?.toLowerCase().includes(query))
+        : true;
+
+      let matchesStage = true;
+      if (filterStage !== "all") {
+        matchesStage = c.exitedAt === filterStage;
+      }
+
+      return matchesSearch && matchesStage;
+    });
+  }, [checkouts, searchQuery, filterStage]);
+
+  const handleWhatsAppRecover = (lead: CheckoutDraft) => {
+    const message = `Hi ${lead.name.split(" ")[0]}, I saw you were checking out the items on The.iPhone.Project but got disconnected. I can help complete your order or provide a special discount! Would you like me to assist?`;
+    window.open(`https://wa.me/91${lead.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(message)}`, "_blank");
+  };
+
+  const handleEmailRecover = (lead: CheckoutDraft) => {
+    if (lead.email.includes("No email")) return;
+    const subject = "Continue your checkout - The.iPhone.Project";
+    const body = `Hi ${lead.name.split(" ")[0]},\n\nWe noticed you left items in your checkout session. Click here to complete your order.\n\nBest regards,\nThe.iPhone.Project Team`;
+    window.open(`mailto:${lead.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, "_blank");
+  };
+
+  return (
+    <main className="min-h-screen bg-background text-foreground">
+      <section className="mx-auto max-w-7xl">
+        {/* Title Block */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex size-12 items-center justify-center rounded-2xl bg-zinc-800/40 text-white">
+              <CreditCard className="size-6 text-zinc-400" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Admin</p>
+              <h1 className="mt-1 text-3xl font-bold font-display text-white">Checkouts</h1>
+            </div>
+          </div>
+          <div>
+            <Link
+              href="/admin"
+              className="rounded-full border border-zinc-800 px-4 py-2 text-sm hover:border-foreground/40 text-zinc-400 hover:text-white"
+            >
+              Dashboard
+            </Link>
+          </div>
+        </div>
+
+        {error && (
+          <div className="mt-6 rounded-2xl bg-destructive/10 p-4 text-sm text-foreground">
+            {error}
+          </div>
+        )}
+
+        {/* Metric Cards */}
+        <div className="mt-8 grid gap-4 grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-3xl border border-zinc-800/40 bg-[#0e0e11] p-5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+              Total Draft Sessions
+            </p>
+            <p className="mt-2 text-3xl font-black text-white font-mono leading-none">
+              {stats.total}
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-zinc-800/40 bg-[#0e0e11] p-5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+              Dropped at Start
+            </p>
+            <p className="mt-2 text-3xl font-black text-red-400 font-mono leading-none">
+              {stats.droppedAtStart}
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-zinc-800/40 bg-[#0e0e11] p-5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+              Contacts Captured
+            </p>
+            <p className="mt-2 text-3xl font-black text-emerald-400 font-mono leading-none">
+              {stats.contactCaptured}
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-zinc-800/40 bg-[#0e0e11] p-5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+              Total Leaked Value
+            </p>
+            <p className="mt-2 text-2xl font-black text-yellow-500 font-mono leading-none">
+              ₹{stats.totalLeakedValue.toLocaleString("en-IN")} INR
+            </p>
+          </div>
+        </div>
+
+        {/* Search & Filter Row */}
+        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-1 max-w-lg items-center gap-3 rounded-full border border-zinc-800 bg-[#0c0c0e] px-4 py-2 text-sm">
+            <Search className="size-4 text-zinc-500 shrink-0" />
+            <input
+              type="text"
+              placeholder="Search name, phone, email, products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-transparent outline-none text-zinc-200 placeholder-zinc-500 text-xs font-medium"
+            />
+          </div>
+
+          <div className="flex items-center gap-4 self-end sm:self-auto text-xs">
+            {/* Filter Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2 rounded-full border border-zinc-800 bg-[#0c0c0e] px-4 py-2 font-medium text-zinc-300 hover:border-zinc-700"
+              >
+                <span>
+                  {filterStage === "all"
+                    ? "All Exits"
+                    : filterStage === "fullName"
+                    ? "Exited at start"
+                    : filterStage === "phone"
+                    ? "Exited at mobile"
+                    : filterStage === "address"
+                    ? "Exited at address"
+                    : "Exited at payment"}
+                </span>
+                <ChevronDown className="size-3.5 text-zinc-500" />
+              </button>
+
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-1.5 z-20 w-52 rounded-2xl border border-zinc-800 bg-[#0e0e11] p-1.5 shadow-xl">
+                  {[
+                    { value: "all", label: "All Exits" },
+                    { value: "fullName", label: "Exited at start" },
+                    { value: "phone", label: "Exited at mobile" },
+                    { value: "email", label: "Exited at email" },
+                    { value: "pincode", label: "Exited at PIN" },
+                    { value: "address", label: "Exited at address" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => {
+                        setFilterStage(opt.value);
+                        setDropdownOpen(false);
+                      }}
+                      className={`w-full rounded-xl px-3.5 py-2 text-left text-xs transition ${
+                        filterStage === opt.value
+                          ? "bg-zinc-800 text-white font-semibold"
+                          : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <span className="text-zinc-500 font-medium font-mono shrink-0">
+              {filteredCheckouts.length} checkouts
+            </span>
+          </div>
+        </div>
+
+        {/* Data Table */}
+        <div className="mt-6 overflow-x-auto rounded-3xl border border-zinc-850 bg-[#0c0c0e]">
+          <table className="w-full border-collapse text-left text-sm text-zinc-300">
+            <thead>
+              <tr className="border-b border-zinc-900 bg-zinc-950/40 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
+                <th className="px-6 py-4">Exit Stage</th>
+                <th className="px-6 py-4">Customer</th>
+                <th className="px-6 py-4">Cart Summary</th>
+                <th className="px-6 py-4 text-right">Recovery</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-900">
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-zinc-500 text-xs">
+                    Loading checkout details...
+                  </td>
+                </tr>
+              ) : filteredCheckouts.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-sm text-zinc-500">
+                    No abandoned checkout drafts found.
+                  </td>
+                </tr>
+              ) : (
+                filteredCheckouts.map((draft) => {
+                  const hasContact = draft.phone !== "No contact yet";
+                  const hasEmail = !draft.email.includes("No email");
+
+                  return (
+                    <tr key={draft.id} className="hover:bg-zinc-950/30 transition duration-150">
+                      {/* Exit Badge */}
+                      <td className="px-6 py-6 vertical-top align-top">
+                        <span className={`inline-block rounded-full border px-3 py-1 text-xs font-bold ${draft.badgeColor}`}>
+                          {draft.exitBadge}
+                        </span>
+                      </td>
+
+                      {/* Customer Details */}
+                      <td className="px-6 py-6 vertical-top align-top min-w-[240px]">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2">
+                            <User className="size-3.5 text-zinc-500 shrink-0" />
+                            <p className="text-sm font-bold text-white">{draft.name}</p>
+                          </div>
+                          <p className="text-xs font-semibold text-zinc-400 font-mono">
+                            {draft.phone}
+                          </p>
+                          <p className="text-xs text-zinc-400 font-mono truncate max-w-[200px]">
+                            {draft.email}
+                          </p>
+                          <div className="flex flex-col gap-1 text-[11px] text-zinc-500 font-medium">
+                            <p>{draft.activeText}</p>
+                            {draft.pincode !== "No PIN yet" && (
+                              <p className="truncate max-w-[200px]">
+                                Pin: {draft.pincode} | Address: {draft.address}
+                              </p>
+                            )}
+                          </div>
+                          <div className="inline-block mt-2">
+                            <span className="rounded-full bg-zinc-850 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-zinc-400 border border-zinc-700/20">
+                              {draft.source}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Cart Details */}
+                      <td className="px-6 py-6 vertical-top align-top min-w-[220px]">
+                        <div className="space-y-1.5">
+                          <p className="text-sm font-bold text-white font-mono">
+                            ₹{draft.value.toLocaleString("en-IN")} INR
+                          </p>
+                          <p className="text-xs text-zinc-400 font-medium">
+                            {draft.itemCount} items inside cart
+                          </p>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {draft.items.map((item, idx) => (
+                              <span key={idx} className="rounded border border-zinc-800 bg-zinc-900/40 px-2 py-0.5 text-[10px] font-semibold text-zinc-400">
+                                {item.name || item.productName} ({item.quantity}x)
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Action Recovery Buttons */}
+                      <td className="px-6 py-6 vertical-top align-top text-right shrink-0">
+                        <div className="flex flex-col items-end gap-1.5">
+                          <button
+                            onClick={() => handleWhatsAppRecover(draft)}
+                            disabled={!hasContact}
+                            className={`flex items-center justify-center gap-1.5 w-28 rounded-xl px-3 py-2 text-xs font-bold transition ${
+                              hasContact
+                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
+                                : "bg-zinc-900 text-zinc-600 border border-zinc-800/40 cursor-not-allowed"
+                            }`}
+                          >
+                            <span>WhatsApp</span>
+                            <ExternalLink className="size-3" />
+                          </button>
+
+                          <button
+                            onClick={() => handleEmailRecover(draft)}
+                            disabled={!hasEmail}
+                            className={`flex items-center justify-center gap-1.5 w-28 rounded-xl px-3 py-2 text-xs font-bold transition ${
+                              hasEmail
+                                ? "bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20"
+                                : "bg-zinc-900 text-zinc-600 border border-zinc-800/40 cursor-not-allowed"
+                            }`}
+                          >
+                            <span>{hasEmail ? "Email" : "No Email"}</span>
+                            <ExternalLink className="size-3" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  );
+}
