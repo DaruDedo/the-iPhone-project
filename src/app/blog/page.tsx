@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 
-import { blogPosts } from "@/data/blog";
+import { getBlogPosts } from "@/lib/blog";
 import { absoluteUrl, breadcrumbJsonLd, JsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 };
 
 export default function BlogIndex() {
+  const blogPosts = getBlogPosts();
   return (
     <main className="min-h-screen bg-background text-foreground">
       <JsonLd

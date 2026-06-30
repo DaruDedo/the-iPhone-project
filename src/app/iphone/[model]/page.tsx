@@ -3,8 +3,26 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 import { ProductCard } from "@/components/product-card";
+import { FaqAccordion, type FaqItem } from "@/components/faq-accordion";
 import { getIphoneModels, getProductsByModel } from "@/lib/catalog";
 import { breadcrumbJsonLd, JsonLd } from "@/lib/seo";
+
+function getModelFaqs(modelName: string): FaqItem[] {
+  return [
+    {
+      question: `Are these cases customized for the exact dimensions of the ${modelName}?`,
+      answer: `Yes, every cover is precision-molded to fit the exact millimeter specifications, camera button alignments, speaker grills, and USB-C or Lightning port cutouts of the ${modelName}.`,
+    },
+    {
+      question: `Does the case protect the camera lenses on the ${modelName}?`,
+      answer: `Absolutely. The camera lip features a raised border (0.8mm to 1.2mm depending on the design) to ensure that the camera lenses never touch flat surfaces when placed face down.`,
+    },
+    {
+      question: "Are the buttons responsive and easy to press?",
+      answer: "Yes! Our cases are equipped with independent, tactile buttons (tactile aluminum or high-grade polymer bumpers) that deliver a satisfying click feel and require zero extra pressing effort.",
+    },
+  ];
+}
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -47,15 +65,30 @@ export default async function IphoneModelPage({ params }: { params: Promise<{ mo
 
   const modelProducts = await getProductsByModel(modelSlug);
 
+  const faqs = getModelFaqs(model.name);
+  const pageJsonLd = [
+    breadcrumbJsonLd([
+      { name: "Home", url: "/" },
+      { name: "iPhone models", url: "/#models" },
+      { name: model.name, url: `/iphone/${modelSlug}` },
+    ]),
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.answer,
+        },
+      })),
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <JsonLd
-        data={breadcrumbJsonLd([
-          { name: "Home", url: "/" },
-          { name: "iPhone models", url: "/#models" },
-          { name: model.name, url: `/iphone/${modelSlug}` },
-        ])}
-      />
+      <JsonLd data={pageJsonLd} />
       <section className="mx-auto max-w-7xl px-6 py-16 md:py-24">
         <Link href="/#models" className="text-sm text-muted-foreground hover:text-foreground">
           Back to all models
@@ -79,6 +112,8 @@ export default async function IphoneModelPage({ params }: { params: Promise<{ mo
           ))}
         </div>
       </section>
+
+      <FaqAccordion items={faqs} />
     </main>
   );
 }

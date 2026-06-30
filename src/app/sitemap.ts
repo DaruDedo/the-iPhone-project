@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { blogPosts } from "@/data/blog";
+import { getBlogPosts } from "@/lib/blog";
 import { getCollections, getIphoneModels, getProductCategories, getProducts } from "@/lib/catalog";
 import { productPath } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/seo";
@@ -13,6 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getIphoneModels(),
     getProductCategories(),
   ]);
+  const blogPosts = getBlogPosts();
 
   return [
     {

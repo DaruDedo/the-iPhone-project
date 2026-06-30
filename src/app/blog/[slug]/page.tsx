@@ -3,10 +3,11 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
-import { blogPosts, getPostBySlug } from "@/data/blog";
+import { getBlogPosts, getPostBySlug } from "@/lib/blog";
 import { absoluteUrl, breadcrumbJsonLd, JsonLd, siteConfig } from "@/lib/seo";
 
 export function generateStaticParams() {
+  const blogPosts = getBlogPosts();
   return blogPosts.map((post) => ({ slug: post.slug }));
 }
 
@@ -46,6 +47,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound();
   }
 
+  const blogPosts = getBlogPosts();
   const related = blogPosts.filter((item) => item.slug !== post.slug).slice(0, 3);
   const pageJsonLd = [
     breadcrumbJsonLd([
@@ -62,6 +64,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       datePublished: post.date,
       dateModified: post.date,
       url: absoluteUrl(`/blog/${post.slug}`),
+      image: [absoluteUrl(post.coverImage)],
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": absoluteUrl(`/blog/${post.slug}`),
+      },
       author: {
         "@type": "Person",
         name: post.author,
