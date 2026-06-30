@@ -30,6 +30,26 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/admin", "/checkout"],
       },
+      {
+        userAgent: "GPTBot",
+        allow: "/",
+        disallow: ["/admin", "/checkout"],
+      },
+      {
+        userAgent: "PerplexityBot",
+        allow: "/",
+        disallow: ["/admin", "/checkout"],
+      },
+      {
+        userAgent: "ClaudeBot",
+        allow: "/",
+        disallow: ["/admin", "/checkout"],
+      },
+      {
+        userAgent: "Applebot",
+        allow: "/",
+        disallow: ["/admin", "/checkout"],
+      },
     ],
     sitemap: absoluteUrl("/sitemap.xml"),
     host: siteConfig.url,

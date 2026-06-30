@@ -6,7 +6,7 @@ import { ModelFitSelector } from "@/components/model-fit-selector";
 import { ProductCard } from "@/components/product-card";
 import { getCollections, getProducts } from "@/lib/catalog";
 import { productPath } from "@/lib/routes";
-import { absoluteUrl, JsonLd, productJsonLd } from "@/lib/seo";
+import { absoluteUrl, JsonLd, productJsonLd, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 const reviews = [
   {
@@ -114,6 +114,8 @@ export default async function Home() {
       product.categorySlug !== "covers-cases" && product.categorySlug !== "tempered-glass",
   );
   const homeJsonLd = [
+    organizationJsonLd(),
+    websiteJsonLd(),
     {
       "@context": "https://schema.org",
       "@type": "ItemList",

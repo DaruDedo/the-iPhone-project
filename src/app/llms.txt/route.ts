@@ -1,54 +1,42 @@
-import { getIphoneModels, getProductCategories, getProducts } from "@/lib/catalog";
 import { absoluteUrl, siteConfig } from "@/lib/seo";
 
 export const revalidate = 3600;
 
 export async function GET() {
-  const [products, categories, models] = await Promise.all([
-    getProducts(),
-    getProductCategories(),
-    getIphoneModels(),
-  ]);
-  const body = [
-    `# ${siteConfig.name}`,
+  const lines = [
+    `# ${siteConfig.name} - India's Premium iPhone Accessories Hub`,
     "",
-    siteConfig.description,
+    `> ${siteConfig.description}`,
     "",
-    "## Important Pages",
-    `- Home: ${absoluteUrl("/")}`,
-    `- Search: ${absoluteUrl("/search")}`,
-    `- Combos: ${absoluteUrl("/combos")}`,
-    `- Offers: ${absoluteUrl("/offers")}`,
-    `- Track order: ${absoluteUrl("/track-order")}`,
+    "## About Us",
+    `${siteConfig.name} is India's leading e-commerce store specializing in premium, model-specific iPhone accessories, covers, and cases. From drop-tested protective cases with MagSafe support to high-grade 8K premium tempered glass and camera lens protectors, we provide top-tier craftmanship for iPhones.`,
     "",
-    "## Product Categories",
-    ...categories.map(
-      (category) => `- ${category.title}: ${absoluteUrl(`/category/${category.slug}`)}`,
-    ),
+    "## Key Capabilities",
+    "- **Wide Model Support**: Tailored accessories for iPhone 12, iPhone 13, iPhone 14, iPhone 15, iPhone 16, and iPhone 17 (including Pro, Pro Max, and Plus variants).",
+    "- **Premium Materials**: Frosted matte backplates, titanium alloy bumpers, tactile aluminum buttons, and MagSafe snappable magnetic rings.",
+    "- **Customer Services**: Cash on Delivery (COD) across India, secure UPI payments, free shipping on qualified orders, and a hassle-free 7-day return policy.",
     "",
-    "## Popular iPhone Model Pages",
-    ...models
-      .filter((model) => model.isPopular)
-      .map((model) => `- ${model.name}: ${absoluteUrl(`/iphone/${model.slug}`)}`),
+    "## Key Store URLs",
+    `- Home Page: ${absoluteUrl("/")}`,
+    `- All Products (Shop): ${absoluteUrl("/shop")}`,
+    `- Premium Combos: ${absoluteUrl("/combos")}`,
+    `- Exclusive Offers: ${absoluteUrl("/offers")}`,
+    `- Order Tracking: ${absoluteUrl("/track-order")}`,
+    `- XML Product Feed: ${absoluteUrl("/product-feed.xml")}`,
     "",
-    "## Featured Products",
-    ...products
-      .slice(0, 30)
-      .map(
-        (product) =>
-          `- ${product.name} for ${product.selectedModel?.name ?? product.category}: ${absoluteUrl(`/products/${product.categorySlug}/${product.slug}`)}`,
-      ),
+    "## AI and Developer Resources",
+    `- Full AI Catalog (Markdown): ${absoluteUrl("/llms-full.txt")}`,
+    `- Dynamic Sitemap (XML): ${absoluteUrl("/sitemap.xml")}`,
     "",
-    "## Store Facts",
-    "- Ships across India.",
-    "- COD and manual UPI are supported before payment gateway integration.",
-    "- Product fit is selected by iPhone model where required.",
-    "- Product images and variants are managed from the admin panel.",
+    "## Contact Information",
+    `- Email Support: ${siteConfig.email}`,
+    `- Business Address: ${siteConfig.businessAddress}`,
   ].join("\n");
 
-  return new Response(body, {
+  return new Response(lines, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "public, max-age=3600",
     },
   });
 }
