@@ -358,6 +358,7 @@ export default function CheckoutPage() {
   const saveDraft = useCallback(
     async (currentData: typeof formData) => {
       const exitedAt = getExitedStage(currentData);
+      const visitorId = typeof window !== "undefined" ? window.localStorage.getItem("tip-visitor-id") : null;
       
       void fetch("/api/leads", {
         method: "POST",
@@ -369,6 +370,7 @@ export default function CheckoutPage() {
           phone: currentData.phone || null,
           email: currentData.email || null,
           payload: {
+            visitorId,
             checkoutSessionId,
             exitedAt,
             address: currentData.address || null,
@@ -436,6 +438,30 @@ export default function CheckoutPage() {
   // User Authentication pre-filling state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedInEmail, setLoggedInEmail] = useState("");
+
+  // Load local draft details on mount for unique visitor pre-fill
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = window.localStorage.getItem("tip-checkout-details");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setFormData((prev) => ({
+            ...prev,
+            name: parsed.name || prev.name,
+            phone: parsed.phone || prev.phone,
+            email: parsed.email || prev.email,
+            pincode: parsed.pincode || prev.pincode,
+            city: parsed.city || prev.city,
+            state: parsed.state || prev.state,
+            address: parsed.address || prev.address,
+          }));
+        } catch (e) {
+          console.error("Error loading local checkout draft", e);
+        }
+      }
+    }
+  }, []);
 
   useEffect(() => {
     async function checkUserSession() {
@@ -697,6 +723,7 @@ Please confirm my order!`;
                           onChange={(val) => {
                             setFormData((prev) => {
                               const updated = { ...prev, state: val };
+                              localStorage.setItem("tip-checkout-details", JSON.stringify(updated));
                               void saveDraft(updated);
                               return updated;
                             });
@@ -714,6 +741,7 @@ Please confirm my order!`;
                           onChange={(val) => {
                             setFormData((prev) => {
                               const updated = { ...prev, city: val };
+                              localStorage.setItem("tip-checkout-details", JSON.stringify(updated));
                               return updated;
                             });
                           }}
@@ -737,6 +765,7 @@ Please confirm my order!`;
                             const val = e.target.value;
                             setFormData((prev) => {
                               const updated = { ...prev, [name]: val };
+                              localStorage.setItem("tip-checkout-details", JSON.stringify(updated));
                               if (name === "pincode") {
                                 if (val.trim().length === 6) {
                                   void lookupPincode(val.trim());
@@ -769,7 +798,14 @@ Please confirm my order!`;
                       required
                       rows={4}
                       value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormData((prev) => {
+                          const updated = { ...prev, address: val };
+                          localStorage.setItem("tip-checkout-details", JSON.stringify(updated));
+                          return updated;
+                        });
+                      }}
                       onBlur={() => saveDraft(formData)}
                       placeholder="House number, street, area, city, state"
                       className="mt-1 sm:mt-2 w-full resize-none rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none focus:border-foreground/50"

@@ -161,12 +161,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         if (now - lastTrackedTime > 1500) {
           lastTrackedRef.current[trackKey] = now;
+          const visitorId = typeof window !== "undefined" ? window.localStorage.getItem("tip-visitor-id") : null;
           void fetch("/api/leads", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               eventName: "add_to_cart",
               payload: {
+                visitorId,
                 productSlug: product.slug,
                 productName: product.name,
                 model: model ?? modelSlug ?? product.selectedModel?.name,

@@ -43,6 +43,7 @@ export default function AdminAIVisibilityPage() {
   const [sources, setSources] = useState<Record<string, number>>({});
   const [searches, setSearches] = useState<SearchEvent[]>([]);
   const [products, setProducts] = useState<AuditProduct[]>([]);
+  const [uniqueVisitors, setUniqueVisitors] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -79,6 +80,7 @@ export default function AdminAIVisibilityPage() {
           sources?: Record<string, number>;
           searches?: SearchEvent[];
           products?: AuditProduct[];
+          uniqueVisitorsCount?: number;
           error?: string;
         };
 
@@ -90,6 +92,7 @@ export default function AdminAIVisibilityPage() {
         setSources(result.sources ?? {});
         setSearches(result.searches ?? []);
         setProducts(result.products ?? []);
+        setUniqueVisitors(result.uniqueVisitorsCount ?? 0);
       } catch (err) {
         setError("Failed to fetch AI Visibility metrics.");
       } finally {
@@ -141,7 +144,7 @@ export default function AdminAIVisibilityPage() {
         )}
 
         {/* Top Metric Cards */}
-        <div className="mt-8 grid gap-4 grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-4 grid-cols-2 lg:grid-cols-5">
           <div className="rounded-3xl border border-border bg-card p-5">
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               AI Traffic
@@ -151,6 +154,18 @@ export default function AdminAIVisibilityPage() {
             </p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
               Bot hits (ChatGPT/Perplexity)
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-border bg-card p-5">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Unique Visitors
+            </p>
+            <p className="mt-2 text-3xl font-bold text-sky-400">
+              {uniqueVisitors}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+              Active shopper sessions
             </p>
           </div>
 

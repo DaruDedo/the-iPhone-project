@@ -46,6 +46,21 @@ export async function GET(request: Request) {
       return acc;
     }, {} as Record<string, number>);
 
+    // 1b. Fetch unique visitor count based on visitorId in payload
+    const uniqueVisitorRows = await db
+      .select({
+        count: sql<number>`count(distinct (${schema.analyticsEvents.payload}->>'visitorId'))::int`,
+      })
+      .from(schema.analyticsEvents)
+      .where(
+        and(
+          gte(schema.analyticsEvents.createdAt, startDate),
+          sql`${schema.analyticsEvents.payload}->>'visitorId' is not null`
+        )
+      );
+
+    const uniqueVisitorsCount = uniqueVisitorRows[0]?.count ?? 0;
+
     // 2. Fetch recent search queries filtered by timeframe
     const searches = await db.query.analyticsEvents.findMany({
       where: and(
@@ -74,6 +89,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       sources,
       searches,
+      uniqueVisitorsCount,
       products: products.map((p) => {
         const hasDesc = !!p.description?.trim();
         const hasSeoTitle = !!p.seoTitle?.trim();

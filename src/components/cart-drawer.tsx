@@ -63,12 +63,14 @@ export function CartDrawer() {
   }
 
   const handleCheckoutClick = () => {
+    const visitorId = typeof window !== "undefined" ? window.localStorage.getItem("tip-visitor-id") : null;
     void fetch("/api/leads", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         eventName: "checkout_started",
         payload: {
+          visitorId,
           subtotal,
           itemCount: items.reduce((total, item) => total + item.quantity, 0),
           items: items.map((item) => ({

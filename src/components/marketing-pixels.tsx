@@ -39,6 +39,31 @@ export function MarketingPixels() {
         page_path: `${pathname}${window.location.search}`,
       });
     }
+
+    // Unique visitor session tracking
+    if (typeof window !== "undefined") {
+      let visitorId = window.localStorage.getItem("tip-visitor-id");
+      if (!visitorId) {
+        if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+          visitorId = crypto.randomUUID();
+        } else {
+          visitorId = "visitor-" + Math.random().toString(36).substring(2, 15) + "-" + Date.now();
+        }
+        window.localStorage.setItem("tip-visitor-id", visitorId);
+      }
+
+      void fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventName: "page_view",
+          payload: {
+            visitorId,
+            path: pathname,
+          },
+        }),
+      }).catch(() => {});
+    }
   }, [pathname]);
 
   return (
