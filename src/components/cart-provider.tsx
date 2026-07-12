@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useRef, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import type { Product } from "@/data/products";
@@ -62,6 +62,7 @@ export function getCartItemKey(
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const lastTrackedRef = useRef<{ [key: string]: number }>({});
 
   useEffect(() => {
     const saved = window.localStorage.getItem("tip-cart");
@@ -153,19 +154,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
           value: product.price * quantity,
           currency: "INR",
         });
-        void fetch("/api/leads", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            eventName: "add_to_cart",
-            payload: {
-              productSlug: product.slug,
-              productName: product.name,
-              model: model ?? modelSlug ?? product.selectedModel?.name,
-              quantity,
-            },
-          }),
-        }).catch(() => {});
+        
+        const now = Date.now();
+        const trackKey = `${product.slug}-${modelSlug ?? model ?? ""}-${quantity}`;
+        const lastTrackedTime = lastTrackedRef.current[trackKey] || 0;
+
+        if (now - lastTrackedTime > 1500) {
+          lastTrackedRef.current[trackKey] = now;
+          void fetch("/api/leads", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              eventName: "add_to_cart",
+              payload: {
+                productSlug: product.slug,
+                productName: product.name,
+                model: model ?? modelSlug ?? product.selectedModel?.name,
+                quantity,
+              },
+            }),
+          }).catch(() => {});
+        }
       },
       updateQuantity: (key, quantity) => {
         setItems((current) =>

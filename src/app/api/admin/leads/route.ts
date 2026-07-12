@@ -76,63 +76,7 @@ export async function GET(request: Request) {
     }, {} as Record<string, number>);
 
     // Define simulated leads
-    const simulatedLeads: CartLead[] = [
-      {
-        id: "sim-1",
-        name: "Ayush Katiyar",
-        phone: "9369281958",
-        email: "ayush@example.com",
-        score: 57,
-        status: "Checkout started",
-        activeText: "Active about 16 hours ago",
-        signalsCount: 3,
-        site: siteLabel,
-        domain: host,
-        value: 799,
-        summary: "Current value - 1 add-to-cart, 2 opens",
-        hasReward: false,
-        productTag: "Aventus",
-        connectionText: "Checkout ₹799 INR",
-        createdAt: new Date(Date.now() - 16 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "sim-2",
-        name: "Unknown visitor",
-        phone: "No contact yet",
-        email: null,
-        score: 32,
-        status: "Checkout started",
-        activeText: "Active about 2 hours ago",
-        signalsCount: 9,
-        site: siteLabel,
-        domain: host,
-        value: 799,
-        summary: "Current value - 1 add-to-cart, 8 opens",
-        hasReward: false,
-        productTag: "Aventus",
-        connectionText: "Checkout ₹799 INR",
-        connectionDetail: "Dropped at fullName",
-        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      },
-      {
-        id: "sim-3",
-        name: "Rohan Sharma",
-        phone: "9876543210",
-        email: "rohan@example.com",
-        score: 84,
-        status: "Checkout started",
-        activeText: "Active about 30 mins ago",
-        signalsCount: 5,
-        site: siteLabel,
-        domain: host,
-        value: 1598,
-        summary: "Current value - 2 add-to-cart, 3 opens",
-        hasReward: true,
-        productTag: "Miles Morales",
-        connectionText: "Checkout ₹1,598 INR",
-        createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-      }
-    ];
+    const simulatedLeads: CartLead[] = [];
 
     // Filter events
     const checkoutStartedEvents = realEvents.filter((e) => e.eventName === "checkout_started");

@@ -108,9 +108,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   function SidebarContent() {
     return (
       <div className="flex h-full flex-col justify-between bg-[#0e0e11] px-4 py-6 text-zinc-300">
-        <div className="space-y-7">
+        <div className="flex flex-1 flex-col min-h-0 space-y-7">
           {/* Logo Brand Header */}
-          <div className="flex items-center gap-3 px-2">
+          <div className="flex items-center gap-3 px-2 shrink-0">
             <div className="flex size-9 items-center justify-center rounded-xl bg-white font-mono text-xl font-black text-[#0c0c0e]">
               T
             </div>
@@ -125,7 +125,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* Navigation Groups */}
-          <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto pr-1 space-y-6 scrollbar-thin scrollbar-thumb-zinc-850 scrollbar-track-transparent">
             {navigationGroups.map((group) => (
               <div key={group.label} className="space-y-2">
                 <p className="px-3 text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-500">
@@ -158,13 +158,15 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Footer / Logout */}
-        <button
-          onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-zinc-400 transition hover:bg-red-500/10 hover:text-red-400"
-        >
-          <LogOut className="size-4" />
-          <span>Log out</span>
-        </button>
+        <div className="pt-4 mt-4 border-t border-zinc-800/50 shrink-0">
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-zinc-400 transition hover:bg-red-500/10 hover:text-red-400"
+          >
+            <LogOut className="size-4" />
+            <span>Log out</span>
+          </button>
+        </div>
       </div>
     );
   }
