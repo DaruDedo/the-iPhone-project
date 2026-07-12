@@ -2,6 +2,7 @@ import { getIphoneModels, getProductCategories, getProducts } from "@/lib/catalo
 import { productPath } from "@/lib/routes";
 import { absoluteUrl, siteConfig } from "@/lib/seo";
 import { getStaticProductReviews } from "@/lib/product-reviews";
+import { getBlogPosts } from "@/lib/blog";
 
 export const revalidate = 3600;
 
@@ -11,6 +12,8 @@ export async function GET() {
     getProductCategories(),
     getIphoneModels(),
   ]);
+  const blogPosts = getBlogPosts();
+  
   const lines = [
     `# ${siteConfig.name} Full AI Catalog`,
     "",
@@ -66,6 +69,16 @@ export async function GET() {
         "",
       ];
     }),
+    "## Blog Posts & Landing Guides",
+    ...blogPosts.flatMap((post) => [
+      `### ${post.title}`,
+      `URL: ${absoluteUrl(`/blog/${post.slug}`)}`,
+      `Excerpt: ${post.excerpt}`,
+      `Topic/Tag: ${post.tag}`,
+      `Read Time: ${post.readTime}`,
+      `Outline: ${post.content.split("\n\n").slice(0, 2).join("\n")}`,
+      "",
+    ]),
   ].join("\n");
 
   return new Response(lines, {
